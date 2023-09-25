@@ -145,6 +145,9 @@ public class QueryServiceImpl implements QueryService {
                     .state(ParseResp.ParseState.FAILED)
                     .build();
         }
+        List<SolvedQueryRecallResp> solvedQueryRecallResps =
+                queryResponder.recallSolvedQuery(queryCtx.getRequest().getQueryText());
+        parseResult.setSimilarSolvedQuery(solvedQueryRecallResps);
         return parseResult;
     }
 
