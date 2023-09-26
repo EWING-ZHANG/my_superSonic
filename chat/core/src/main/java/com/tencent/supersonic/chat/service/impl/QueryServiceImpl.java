@@ -14,12 +14,14 @@ import com.tencent.supersonic.chat.api.pojo.request.QueryFilter;
 import com.tencent.supersonic.chat.api.pojo.request.DimensionValueReq;
 import com.tencent.supersonic.chat.api.pojo.request.ExecuteQueryReq;
 import com.tencent.supersonic.chat.api.pojo.request.QueryReq;
+import com.tencent.supersonic.chat.api.pojo.request.SolvedQueryReq;
 import com.tencent.supersonic.chat.api.pojo.response.EntityInfo;
 import com.tencent.supersonic.chat.api.pojo.response.ParseResp;
 import com.tencent.supersonic.chat.api.pojo.response.QueryResult;
 import com.tencent.supersonic.chat.api.pojo.response.QueryState;
 import com.tencent.supersonic.chat.parser.llm.dsl.DSLParseResult;
 import com.tencent.supersonic.chat.persistence.dataobject.ChatParseDO;
+import com.tencent.supersonic.chat.persistence.dataobject.ChatQueryDO;
 import com.tencent.supersonic.chat.persistence.dataobject.CostType;
 import com.tencent.supersonic.chat.persistence.dataobject.StatisticsDO;
 import com.tencent.supersonic.chat.query.QuerySelector;
@@ -146,7 +148,7 @@ public class QueryServiceImpl implements QueryService {
                     .build();
         }
         List<SolvedQueryRecallResp> solvedQueryRecallResps =
-                queryResponder.recallSolvedQuery(queryCtx.getRequest().getQueryText());
+                queryResponder.recallSolvedQuery(queryCtx.getRequest().getQueryText(), queryReq.getAgentId());
         parseResult.setSimilarSolvedQuery(solvedQueryRecallResps);
         return parseResult;
     }
@@ -168,6 +170,7 @@ public class QueryServiceImpl implements QueryService {
     public QueryResult performExecution(ExecuteQueryReq queryReq) throws Exception {
         ChatParseDO chatParseDO = chatService.getParseInfo(queryReq.getQueryId(),
                 queryReq.getUser().getName(), queryReq.getParseId());
+        ChatQueryDO chatQueryDO = chatService.getLastQuery(queryReq.getChatId());
         List<StatisticsDO> timeCostDOList = new ArrayList<>();
         SemanticParseInfo parseInfo = JsonUtil.toObject(chatParseDO.getParseInfo(), SemanticParseInfo.class);
         SemanticQuery semanticQuery = QueryManager.createQuery(parseInfo.getQueryMode());
@@ -192,6 +195,11 @@ public class QueryServiceImpl implements QueryService {
             if (queryReq.isSaveAnswer() && QueryState.SUCCESS.equals(queryResult.getQueryState())) {
                 chatCtx.setParseInfo(parseInfo);
                 chatService.updateContext(chatCtx);
+                queryResponder.saveSolvedQuery(SolvedQueryReq.builder().parseId(queryReq.getParseId())
+                        .queryId(queryReq.getQueryId())
+                        .agentId(chatQueryDO.getAgentId())
+                        .modelId(parseInfo.getModelId())
+                        .queryText(queryReq.getQueryText()).build());
             }
             chatCtx.setQueryText(queryReq.getQueryText());
             chatCtx.setUser(queryReq.getUser().getName());
