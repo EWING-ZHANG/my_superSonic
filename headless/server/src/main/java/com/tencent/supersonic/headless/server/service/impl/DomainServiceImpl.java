@@ -240,7 +240,8 @@ public class DomainServiceImpl implements DomainService {
         if (user.isSuperAdmin()) {
             return true;
         }
-        if (admins.contains(user.getId().toString()) || domainResp.getCreatedBy().equals(user.getId().toString())) {
+        if (admins.contains(user.getId().toString())
+                || domainResp.getCreatedBy().equals(user.getId().toString())) {
             return true;
         }
         if (CollectionUtils.isEmpty(adminOrgs)) {
