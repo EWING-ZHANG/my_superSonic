@@ -14,6 +14,7 @@ import { configProviderTheme } from '../config/themeSettings';
 export { request } from './services/request';
 import { ROUTE_AUTH_CODES } from '../config/routes';
 import AppPage from './pages/index';
+// App.tsx
 
 const replaceRoute = '/';
 
@@ -53,7 +54,7 @@ export async function getInitialState(): Promise<{
       if (code === 200) {
         return { ...data, staffName: data.staffName || data.name };
       }
-    } catch (error) {}
+    } catch (error) { }
     return undefined;
   };
 
@@ -72,6 +73,7 @@ export async function getInitialState(): Promise<{
   const authCodes = getAuthCodes({
     currentUser,
   });
+
 
   return {
     fetchUserInfo,

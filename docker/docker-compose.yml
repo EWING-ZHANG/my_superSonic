@@ -98,17 +98,12 @@ services:
       - 8.8.8.8
       - 8.8.4.4
     volumes:
-      #1.Named Volumes are best for persistent data managed by Docker.
       - supersonic_data:/usr/src/app/supersonic-standalone-${SUPERSONIC_VERSION:-latest}
-      #2.Bind Mounts are suitable for frequent modifications and debugging.
-      #      - ./conf/application-prd.yaml:/usr/src/app/supersonic-standalone-${SUPERSONIC_VERSION:-latest}/conf/application-prd.yaml
-      #3.Detailed Bind Mounts offer more control over the mount behavior.
-      #      - type: bind
-      #        source: ./supersonic-standalone-${SUPERSONIC_VERSION:-latest}/logs
-      #        target: /usr/src/app/supersonic-standalone-${SUPERSONIC_VERSION:-latest}/logs
-      #        bind:
-      #          propagation: rprivate
-      #          create_host_path: true
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9080" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 volumes:
   mysql_data:
   chroma_data:

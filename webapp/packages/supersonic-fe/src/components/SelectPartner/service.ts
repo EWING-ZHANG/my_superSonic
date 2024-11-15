@@ -6,7 +6,7 @@ export async function getUserByDeptid(id: any) {
   });
 }
 export async function getOrganizationTree() {
-  return request<any>(`${process.env.AUTH_API_BASE_URL}user/getOrganizationTree`, {
+  return request<any>(`${process.env.API_BASE_URL}department/getOrganizationTree`, {
     method: 'GET',
   });
 }

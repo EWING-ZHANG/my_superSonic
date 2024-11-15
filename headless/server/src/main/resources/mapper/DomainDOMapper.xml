@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tencent.supersonic.headless.server.persistence.mapper.DomainDOMapper">
+    <update id="batchUpdateAdmin">
+        <foreach collection="list" item="domain" separator=";">
+            update s2_domain d set admin_org=#{domain.adminOrg} where d.id=#{domain.id}
+        </foreach>
+    </update>
+    <update id="batchUpdateViewer">
+        <foreach collection="list" item="domain" separator=";">
+        update s2_domain d set view_org=#{domain.viewOrg} where d.id=#{domain.id}
+        </foreach>
+    </update>
+    <update id="batchUpdateAdminUser">
+        <foreach collection="list" item="domain" separator=";">
+            update s2_domain d set admin=#{domain.admin} where d.id=#{domain.id}
+        </foreach>
+    </update>
+    <update id="batchUpdateViewerUser">
+        <foreach collection="list" item="domain" separator=";">
+            update s2_domain d set viewer=#{domain.viewer} where d.id=#{domain.id}
+        </foreach>
+    </update>
+
+
+    <select id="selectViewer"
+            resultType="com.tencent.supersonic.headless.server.persistence.dataobject.DomainDO">
+        SELECT * FROM s2_domain d
+        WHERE FIND_IN_SET(#{id},view_org)>0
+
+    </select>
+    <select id="selectAdminOrg"
+            resultType="com.tencent.supersonic.headless.server.persistence.dataobject.DomainDO">
+        SELECT * FROM s2_domain d
+        WHERE FIND_IN_SET(#{id},admin_org)>0
+
+    </select>
+    <select id="selectViewUser"
+            resultType="com.tencent.supersonic.headless.server.persistence.dataobject.DomainDO">
+        SELECT * FROM s2_domain d
+        WHERE FIND_IN_SET(#{id},viewer)>0
+    </select>
+    <select id="selectAdminUser"
+            resultType="com.tencent.supersonic.headless.server.persistence.dataobject.DomainDO">
+        SELECT * FROM s2_domain d
+        WHERE FIND_IN_SET(#{id},admin)>0
+    </select>
+</mapper>

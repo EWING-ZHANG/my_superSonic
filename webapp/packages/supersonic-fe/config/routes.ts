@@ -43,6 +43,14 @@ const ROUTES = [
     envEnableList: [ENV_KEY.CHAT],
   },
   {
+    path: '/UserDepartment',
+    name: 'UserDepartmentManagement',
+    component: './SemanticModel/UserDepartmentManagement',
+    envEnableList: [ENV_KEY.CHAT],
+
+    access: ROUTE_AUTH_CODES.SYSTEM_ADMIN,
+  },
+  {
     path: '/plugin',
     name: 'plugin',
     component: './ChatPlugin',
@@ -176,5 +184,7 @@ const ROUTES = [
     component: './401',
   },
 ];
+
+
 
 export default ROUTES;

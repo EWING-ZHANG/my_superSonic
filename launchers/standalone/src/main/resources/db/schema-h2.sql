@@ -407,14 +407,14 @@ CREATE TABLE IF NOT EXISTS `s2_user_department` (
     `department` varchar(200) NOT NULL, -- department of user
      PRIMARY KEY (`user_name`,`department`)
     );
-COMMENT ON TABLE s2_user_department IS 'user_department_info';
+COMMENT ON TABLE 's2_user_department' IS 'user_department_info';
 
 CREATE TABLE IF NOT EXISTS `s2_pv_uv_statis` (
     `imp_date` varchar(200) NOT NULL,
     `user_name` varchar(200) NOT NULL,
     `page` varchar(200) NOT NULL
     );
-COMMENT ON TABLE s2_pv_uv_statis IS 's2_pv_uv_statis';
+COMMENT ON TABLE 's2_pv_uv_statis' IS 's2_pv_uv_statis';
 
 CREATE TABLE IF NOT EXISTS `s2_stay_time_statis` (
     `imp_date` varchar(200) NOT NULL,
@@ -422,7 +422,7 @@ CREATE TABLE IF NOT EXISTS `s2_stay_time_statis` (
     `stay_hours` DOUBLE NOT NULL,
     `page` varchar(200) NOT NULL
     );
-COMMENT ON TABLE s2_stay_time_statis IS 's2_stay_time_statis_info';
+COMMENT ON TABLE 's2_stay_time_statis' IS 's2_stay_time_statis_info';
 
 CREATE TABLE IF NOT EXISTS `singer` (
     `singer_name` varchar(200) NOT NULL,
@@ -434,7 +434,7 @@ CREATE TABLE IF NOT EXISTS `singer` (
     `favor_cnt` bigINT DEFAULT NULL,
      PRIMARY KEY (`singer_name`)
     );
-COMMENT ON TABLE singer IS 'singer_info';
+COMMENT ON TABLE 'singer' IS 'singer_info';
 
 CREATE TABLE IF NOT EXISTS `s2_dictionary_conf` (
    `id` INT NOT NULL AUTO_INCREMENT,
@@ -447,7 +447,7 @@ CREATE TABLE IF NOT EXISTS `s2_dictionary_conf` (
    `created_by` varchar(100) NOT NULL ,
    PRIMARY KEY (`id`)
 );
-COMMENT ON TABLE s2_dictionary_conf IS 'dictionary conf information table';
+COMMENT ON TABLE 's2_dictionary_conf' IS 'dictionary conf information table';
 
 CREATE TABLE IF NOT EXISTS `s2_dictionary_task` (
    `id` INT NOT NULL AUTO_INCREMENT,
@@ -462,7 +462,7 @@ CREATE TABLE IF NOT EXISTS `s2_dictionary_task` (
    `elapsed_ms` bigINT DEFAULT NULL , -- the task takes time in milliseconds
    PRIMARY KEY (`id`)
 );
-COMMENT ON TABLE s2_dictionary_task IS 'dictionary task information table';
+COMMENT ON TABLE 's2_dictionary_task' IS 'dictionary task information table';
 
 
 
@@ -473,7 +473,7 @@ CREATE TABLE IF NOT EXISTS `genre` (
     `most_popular_in` varchar(50) ,
     PRIMARY KEY (`g_name`)
     );
-COMMENT ON TABLE genre IS 'genre';
+COMMENT ON TABLE 'genre' IS 'genre';
 
 CREATE TABLE IF NOT EXISTS `artist` (
     `artist_name` varchar(50) NOT NULL , -- genre name
@@ -482,7 +482,7 @@ CREATE TABLE IF NOT EXISTS `artist` (
     `g_name` varchar(50),
     PRIMARY KEY (`artist_name`,`citizenship`)
     );
-COMMENT ON TABLE artist IS 'artist';
+COMMENT ON TABLE 'artist' IS 'artist';
 
 CREATE TABLE IF NOT EXISTS `files` (
     `f_id` bigINT NOT NULL,
@@ -492,7 +492,7 @@ CREATE TABLE IF NOT EXISTS `files` (
     `formats` varchar(20) ,
     PRIMARY KEY (`f_id`)
     );
-COMMENT ON TABLE files IS 'files';
+COMMENT ON TABLE 'files' IS 'files';
 
 CREATE TABLE IF NOT EXISTS `song` (
     `imp_date` varchar(50) ,
@@ -507,7 +507,7 @@ CREATE TABLE IF NOT EXISTS `song` (
     `resolution` bigINT NOT NULL,
      PRIMARY KEY (`imp_date`,`song_name`)
     );
-COMMENT ON TABLE song IS 'song';
+COMMENT ON TABLE 'song' IS 'song';
 
 CREATE TABLE IF NOT EXISTS `company` (
     `imp_date` varchar(50) ,
@@ -628,7 +628,7 @@ CREATE TABLE IF NOT EXISTS `s2_tag` (
     `updated_by` varchar(100) DEFAULT NULL ,
     PRIMARY KEY (`id`)
     );
-COMMENT ON TABLE s2_tag IS 'tag information';
+COMMENT ON TABLE 's2_tag' IS 'tag information';
 
 CREATE TABLE IF NOT EXISTS `s2_tag_object` (
     `id` INT NOT NULL  AUTO_INCREMENT,
@@ -645,7 +645,7 @@ CREATE TABLE IF NOT EXISTS `s2_tag_object` (
     `ext` LONGVARCHAR DEFAULT NULL  ,
     PRIMARY KEY (`id`)
     );
-COMMENT ON TABLE s2_tag IS 'tag object information';
+COMMENT ON TABLE 's2_tag' IS 'tag object information';
 
 CREATE TABLE IF NOT EXISTS `s2_query_rule` (
     `id` INT NOT NULL  AUTO_INCREMENT,
@@ -665,7 +665,7 @@ CREATE TABLE IF NOT EXISTS `s2_query_rule` (
     `ext` LONGVARCHAR DEFAULT NULL  ,
     PRIMARY KEY (`id`)
     );
-COMMENT ON TABLE s2_query_rule IS 'tag query rule table';
+COMMENT ON TABLE 's2_query_rule' IS 'tag query rule table';
 
 CREATE TABLE IF NOT EXISTS `s2_term` (
     `id` INT NOT NULL  AUTO_INCREMENT,
@@ -681,7 +681,7 @@ CREATE TABLE IF NOT EXISTS `s2_term` (
     `updated_by` varchar(100) DEFAULT NULL ,
     PRIMARY KEY (`id`)
     );
-COMMENT ON TABLE s2_term IS 'term info';
+COMMENT ON TABLE 's2_term' IS 'term info';
 
 CREATE TABLE IF NOT EXISTS `s2_user_token` (
    `id` INT NOT NULL AUTO_INCREMENT,
@@ -697,4 +697,4 @@ CREATE TABLE IF NOT EXISTS `s2_user_token` (
     `expire_date_time` DATETIME NOT NULL,
     PRIMARY KEY (`id`)
     );
-COMMENT ON TABLE s2_user_token IS 'user token info';
+COMMENT ON TABLE 's2_user_token' IS 'user token info';

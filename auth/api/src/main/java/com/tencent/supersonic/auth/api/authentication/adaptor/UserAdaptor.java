@@ -40,4 +40,7 @@ public interface UserAdaptor {
     UserToken getUserToken(Long id);
 
     List<UserToken> getUserTokens(String userName);
+
+    void deleteUserById(Long id);
+
 }

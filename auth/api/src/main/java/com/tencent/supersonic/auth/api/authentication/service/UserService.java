@@ -43,4 +43,7 @@ public interface UserService {
     UserToken getUserToken(Long id);
 
     void deleteUserToken(Long id);
+
+    void deleteUserById(Long id);
+
 }

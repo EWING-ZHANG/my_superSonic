@@ -235,11 +235,12 @@ public class DomainServiceImpl implements DomainService {
 
     private boolean checkAdminPermission(Set<String> orgIds, User user, DomainResp domainResp) {
         List<String> admins = domainResp.getAdmins();
+        // adminOrgs 当前的域中有管理员权限的部门
         List<String> adminOrgs = domainResp.getAdminOrgs();
         if (user.isSuperAdmin()) {
             return true;
         }
-        if (admins.contains(user.getName()) || domainResp.getCreatedBy().equals(user.getName())) {
+        if (admins.contains(user.getId().toString()) || domainResp.getCreatedBy().equals(user.getId().toString())) {
             return true;
         }
         if (CollectionUtils.isEmpty(adminOrgs)) {
@@ -262,7 +263,7 @@ public class DomainServiceImpl implements DomainService {
         if (domainResp.openToAll()) {
             return true;
         }
-        if (viewers.contains(user.getName())) {
+        if (viewers.contains(user.getId().toString())) {
             return true;
         }
         if (CollectionUtils.isEmpty(viewOrgs)) {

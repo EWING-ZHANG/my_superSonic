@@ -16,4 +16,6 @@ public interface UserDOMapper {
     List<UserDO> selectByExample(UserDOExample example);
 
     void updateByPrimaryKey(UserDO userDO);
+
+    void deleteUserById(Long id);
 }

@@ -20,6 +20,7 @@ public class UserDO {
 
     /** */
     private Integer isAdmin;
+    private Integer deleted;
 
     /** @return id */
     public Long getId() {

@@ -8,8 +8,10 @@ import com.tencent.supersonic.auth.api.authentication.pojo.UserToken;
 import com.tencent.supersonic.auth.api.authentication.request.UserReq;
 import com.tencent.supersonic.auth.api.authentication.request.UserTokenReq;
 import com.tencent.supersonic.auth.api.authentication.service.UserService;
+import com.tencent.supersonic.auth.authentication.request.DepartmentReq;
 import com.tencent.supersonic.common.pojo.User;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -96,4 +98,15 @@ public class UserController {
     public void deleteUserToken(@RequestParam(name = "tokenId") Long tokenId) {
         userService.deleteUserToken(tokenId);
     }
+
+    /**
+     * 删除用户
+     * 
+     * @param id
+     */
+    @DeleteMapping("/deleteUser/{id}")
+    public void deleteUserById(@PathVariable("id") Long id) {
+        userService.deleteUserById(id);
+    }
+
 }

@@ -7,7 +7,7 @@ server:
 
 spring:
   profiles:
-    active: local
+    active: prd
   application:
     name: chat
   config:
@@ -19,6 +19,7 @@ spring:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
 
+
 mybatis:
   mapper-locations=classpath:mappers/custom/*.xml,classpath*:/mappers/*.xml
 
@@ -26,7 +27,13 @@ logging:
   level:
     dev.langchain4j: DEBUG
     dev.ai4j.openai4j: DEBUG
-
+    com:
+      tencent:
+        supersonic: DEBUG  # 设置你自己项目包的日志级别
+    org:
+      apache:
+        ibatis: DEBUG  # 设置 MyBatis 日志输出级别
+      mybatis: DEBUG   # 设置 MyBatis 日志输出级别
 swagger:
   title: 'SuperSonic API Documentation'
   base:

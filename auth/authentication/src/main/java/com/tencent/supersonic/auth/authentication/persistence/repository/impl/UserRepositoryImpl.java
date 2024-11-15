@@ -76,4 +76,9 @@ public class UserRepositoryImpl implements UserRepository {
     public void deleteUserToken(Long tokenId) {
         userTokenDOMapper.deleteById(tokenId);
     }
+
+    @Override
+    public void deleteUserById(Long id) {
+        userDOMapper.deleteUserById(id);
+    }
 }

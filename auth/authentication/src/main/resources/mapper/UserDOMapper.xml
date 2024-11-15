@@ -42,7 +42,10 @@
   <sql id="Base_Column_List">
     id, name, password, salt, display_name, email, is_admin
   </sql>
-  <select id="selectByExample" parameterType="com.tencent.supersonic.auth.authentication.persistence.dataobject.UserDOExample" resultMap="BaseResultMap">
+    <delete id="deleteUserById">
+      delete from s2_user where id=#{id}
+    </delete>
+    <select id="selectByExample" parameterType="com.tencent.supersonic.auth.authentication.persistence.dataobject.UserDOExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct

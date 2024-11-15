@@ -17,8 +17,11 @@ import com.tencent.supersonic.common.pojo.User;
 import com.tencent.supersonic.common.util.AESEncryptionUtil;
 import com.tencent.supersonic.common.util.ContextUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -29,6 +32,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class DefaultUserAdaptor implements UserAdaptor {
+
 
     private List<UserDO> getUserDOList() {
         UserRepository userRepository = ContextUtils.getBean(UserRepository.class);
@@ -53,6 +57,7 @@ public class DefaultUserAdaptor implements UserAdaptor {
 
     @Override
     public List<Organization> getOrganizationTree() {
+        // 根据部门表 得到部门的结构
         Organization superSonic =
                 new Organization("1", "0", "SuperSonic", "SuperSonic", Lists.newArrayList(), true);
         Organization hr =
@@ -200,7 +205,21 @@ public class DefaultUserAdaptor implements UserAdaptor {
 
     @Override
     public Set<String> getUserAllOrgId(String userName) {
-        return Sets.newHashSet();
+        // 根据用户名去查询用户所在的所有的父部门
+        HashSet<String> sets = new HashSet<>();
+
+        // 去部门表中查询该用户属于哪个
+        if (userName.equals("ewing")) {
+            sets.add("2");
+
+        }
+        if (userName.equals("alice")) {
+            sets.add("3");
+        }
+        if (userName.equals("jack")) {
+            sets.add("2");
+        }
+        return sets;
     }
 
     @Override
@@ -239,6 +258,14 @@ public class DefaultUserAdaptor implements UserAdaptor {
                 .map(this::convertUserToken).collect(Collectors.toList());
         return userTokens;
     }
+
+    @Override
+    public void deleteUserById(Long id) {
+        UserRepository userRepository = ContextUtils.getBean(UserRepository.class);
+        userRepository.deleteUserById(id);
+    }
+
+
 
     private UserTokenDO saveUserToken(String tokenName, String userName, String token,
             long expireTime) {

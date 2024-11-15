@@ -8,13 +8,21 @@ import com.tencent.supersonic.auth.api.authentication.pojo.UserToken;
 import com.tencent.supersonic.auth.api.authentication.request.UserReq;
 import com.tencent.supersonic.auth.api.authentication.service.UserService;
 import com.tencent.supersonic.auth.api.authentication.utils.UserHolder;
+import com.tencent.supersonic.auth.authentication.persistence.dataobject.DepartmentDO;
+import com.tencent.supersonic.auth.authentication.persistence.dataobject.UserDepartmentDO;
+import com.tencent.supersonic.auth.authentication.repository.UserDepartmentRepository;
 import com.tencent.supersonic.auth.authentication.utils.ComponentFactory;
 import com.tencent.supersonic.common.config.SystemConfig;
 import com.tencent.supersonic.common.pojo.User;
 import com.tencent.supersonic.common.service.SystemConfigService;
+import io.jsonwebtoken.lang.Objects;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -22,6 +30,10 @@ import java.util.Set;
 public class UserServiceImpl implements UserService {
 
     private SystemConfigService sysParameterService;
+    @Autowired
+    private UserDepartmentRepository userDepartmentRepository;
+    @Autowired
+    private DepartmentService departmentService;
 
     public UserServiceImpl(SystemConfigService sysParameterService) {
         this.sysParameterService = sysParameterService;
@@ -53,7 +65,24 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Set<String> getUserAllOrgId(String userName) {
-        return ComponentFactory.getUserAdaptor().getUserAllOrgId(userName);
+        // 根据userName查询所属部门,然后递归的查询部门然后将所有的部门放进去
+        HashSet<String> result = new HashSet<>();
+        UserDepartmentDO byUserName = userDepartmentRepository.getByUserName(userName);
+
+        // 根据id循环的去查找他的部门
+        if (!Objects.isEmpty(byUserName) && byUserName.getDepartmentId() != null) {
+            DepartmentDO departmentDO = departmentService.getById(byUserName.getDepartmentId());
+            result.add(String.valueOf(departmentDO.getId()));
+            while (!ObjectUtils.isEmpty(departmentDO) && departmentDO.getId() != null
+                    && departmentDO.getParentId() != 0) {
+                departmentDO = departmentService.getById(departmentDO.getParentId());
+                if(!ObjectUtils.isEmpty(departmentDO)){
+                    result.add(String.valueOf(departmentDO.getId()));
+
+                }
+            }
+        }
+        return result;
     }
 
     @Override
@@ -110,4 +139,17 @@ public class UserServiceImpl implements UserService {
     public void deleteUserToken(Long id) {
         ComponentFactory.getUserAdaptor().deleteUserToken(id);
     }
+
+    @Override
+    @Transactional
+    public void deleteUserById(Long id) {
+        ComponentFactory.getUserAdaptor().deleteUserById(id);
+        //删除在user_department表中的数据
+        userDepartmentRepository.deleteByUserId(id);
+        //删除domain表中的viewer和admin   超级管理员应该是不能够删除
+
+        departmentService.unbindUser(id);
+
+    }
+
 }
