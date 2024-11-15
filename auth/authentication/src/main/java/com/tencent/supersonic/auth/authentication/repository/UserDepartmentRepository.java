@@ -19,5 +19,6 @@ public interface UserDepartmentRepository {
     List<UserDepartmentDO> getUserWithDepartment();
 
     List<UserDepartmentDO> searchByName(String searchName);
+
     void deleteByUserId(Long userId);
 }

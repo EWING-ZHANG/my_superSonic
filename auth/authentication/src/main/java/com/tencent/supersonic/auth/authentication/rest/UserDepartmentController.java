@@ -63,9 +63,10 @@ public class UserDepartmentController {
     public List<UserDepartmentDO> getUserWithDepartment() {
         return userDepartmentService.getUserWithDepartment();
     }
-    //根据用户名称进行模糊查询用户以及部门信息数据
+
+    // 根据用户名称进行模糊查询用户以及部门信息数据
     @GetMapping("searchByName")
-    public List<UserDepartmentDO> searchByName(@RequestParam String searchName){
+    public List<UserDepartmentDO> searchByName(@RequestParam String searchName) {
         return userDepartmentService.searchByName(searchName);
     }
 

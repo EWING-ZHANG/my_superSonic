@@ -86,10 +86,10 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
         queryWrapper.lambda().eq(UserDepartmentDO::getDepartmentId, id);
         userDepartmentMapper.delete(queryWrapper);
         // domain中的所有的权限绑定关系解除 domain域里面的对应关系使用一个String来弄的??? 那么会导致不能够感觉String字段里面进行查询
-        //模块之间的这种调用,只能够模块依赖了
-        //查询出admin的 将这个部门从这个字符串中删除
+        // 模块之间的这种调用,只能够模块依赖了
+        // 查询出admin的 将这个部门从这个字符串中删除
         List<DomainDO> adminOrgList = domainDOMapper.selectAdminOrg(id);
-        //循环遍历 进行删除
+        // 循环遍历 进行删除
         String aim = id.toString();
         adminOrgList.forEach(admin -> {
             String stringAdmin = removeAim(aim, admin);
@@ -100,7 +100,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
             String stringViewer = removeAim(aim, viewer);
             viewer.setViewOrg(stringViewer);
         });
-        //只能批量更新
+        // 只能批量更新
         if (!CollectionUtils.isEmpty(adminOrgList)) {
             domainDOMapper.batchUpdateAdmin(adminOrgList);
         }
@@ -111,7 +111,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
     }
 
     @Override
-    //todo 使用updateById 在一个事务里面应该是不会提交?
+    // todo 使用updateById 在一个事务里面应该是不会提交?
     public void unbindUser(Long id) {
         List<DomainDO> adminList = domainDOMapper.selectAdminUser(id);
         String aim = id.toString();
@@ -136,13 +136,11 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
     @Transactional
     @Override
     public void deleteDepartmentAndSubById(Long id) {
-        //查询出部门的数据然后进行遍历
+        // 查询出部门的数据然后进行遍历
         List<DepartmentDO> list = getDepartmentList();
-        //递归地查询出数据的
+        // 递归地查询出数据的
         Set<Long> allChildrenIds = getAllChildrenIds(id, list);
-        allChildrenIds.forEach(allId ->
-                deleteDepartmentById(allId)
-        );
+        allChildrenIds.forEach(allId -> deleteDepartmentById(allId));
     }
 
     public Set<Long> getAllChildrenIds(Long departmentId, List<DepartmentDO> departments) {
@@ -151,7 +149,8 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
         return childrenIds;
     }
 
-    private void findChildrenIds(Long departmentId, List<DepartmentDO> departments, Set<Long> childrenIds) {
+    private void findChildrenIds(Long departmentId, List<DepartmentDO> departments,
+            Set<Long> childrenIds) {
         // 将当前节点的 id 添加到集合中
         childrenIds.add(departmentId);
         Stack<Long> stack = new Stack<>();
@@ -161,8 +160,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
             departmentId = stack.pop();
             Long tempId = departmentId;
             List<DepartmentDO> collect = departments.stream()
-                    .filter(dept -> dept.getParentId() ==
-                            tempId).collect(Collectors.toList());
+                    .filter(dept -> dept.getParentId() == tempId).collect(Collectors.toList());
             for (int i = 0; i < collect.size(); i++) {
                 stack.push(collect.get(i).getId());
                 childrenIds.add(collect.get(i).getId());

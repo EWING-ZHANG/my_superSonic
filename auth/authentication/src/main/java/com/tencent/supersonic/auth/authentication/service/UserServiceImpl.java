@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService {
             while (!ObjectUtils.isEmpty(departmentDO) && departmentDO.getId() != null
                     && departmentDO.getParentId() != 0) {
                 departmentDO = departmentService.getById(departmentDO.getParentId());
-                if(!ObjectUtils.isEmpty(departmentDO)){
+                if (!ObjectUtils.isEmpty(departmentDO)) {
                     result.add(String.valueOf(departmentDO.getId()));
 
                 }
@@ -144,9 +144,9 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteUserById(Long id) {
         ComponentFactory.getUserAdaptor().deleteUserById(id);
-        //删除在user_department表中的数据
+        // 删除在user_department表中的数据
         userDepartmentRepository.deleteByUserId(id);
-        //删除domain表中的viewer和admin   超级管理员应该是不能够删除
+        // 删除domain表中的viewer和admin 超级管理员应该是不能够删除
 
         departmentService.unbindUser(id);
 

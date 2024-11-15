@@ -74,7 +74,7 @@ public class UserDepartmentRepositoryImpl implements UserDepartmentRepository {
     @Override
     public void deleteByUserId(Long userId) {
         QueryWrapper<UserDepartmentDO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(UserDepartmentDO::getUserId,userId);
+        queryWrapper.lambda().eq(UserDepartmentDO::getUserId, userId);
         userDepartmentMapper.delete(queryWrapper);
     }
 }
