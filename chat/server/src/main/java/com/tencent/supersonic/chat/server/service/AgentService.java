@@ -16,4 +16,6 @@ public interface AgentService {
     Agent getAgent(Integer id);
 
     void deleteAgent(Integer id);
+
+    void setAgentAuth(Agent agent);
 }

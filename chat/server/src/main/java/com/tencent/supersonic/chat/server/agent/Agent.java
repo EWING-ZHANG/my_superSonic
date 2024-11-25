@@ -33,6 +33,10 @@ public class Agent extends RecordInfo {
     private String toolConfig;
     private Map<String, ChatApp> chatAppConfig = Collections.emptyMap();
     private VisualConfig visualConfig;
+    private String admin;
+    private String adminOrg;
+    private String viewer;
+    private String viewOrg;
 
     public List<String> getTools(AgentToolType type) {
         Map<String, Object> map = JSONObject.parseObject(toolConfig, Map.class);

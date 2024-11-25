@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
         if (user != null) {
             SystemConfig systemConfig = sysParameterService.getSystemConfig();
             if (!CollectionUtils.isEmpty(systemConfig.getAdmins())
-                    && systemConfig.getAdmins().contains(user.getName())) {
+                    && systemConfig.getAdmins().contains(user.getId().toString())) {
                 user.setIsAdmin(1);
             }
         }

@@ -10,6 +10,7 @@ import com.tencent.supersonic.chat.server.service.AgentService;
 import com.tencent.supersonic.common.pojo.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -49,6 +50,8 @@ public class AgentController {
 
     @RequestMapping("/getAgentList")
     public List<Agent> getAgentList() {
+        //放入当前用户名传过来 如果是admin或者创建者,那么权限就是admin
+        //通过部门来查询 得到权限 前端进行过滤吧
         return agentService.getAgents();
     }
 
@@ -57,4 +60,12 @@ public class AgentController {
         return AgentToolType.getToolTypes();
     }
 
+    /**
+     * 权限控制相关的接口
+     * 根据id修改权限 四个字段
+     */
+    @PostMapping("/setAgentAuth")
+    public void updateAgent(@RequestBody Agent agent) {
+        agentService.setAgentAuth(agent);
+    }
 }

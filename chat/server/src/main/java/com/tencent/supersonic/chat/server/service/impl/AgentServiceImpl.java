@@ -79,6 +79,14 @@ public class AgentServiceImpl extends ServiceImpl<AgentDOMapper, AgentDO> implem
         removeById(id);
     }
 
+    @Override
+    public void setAgentAuth(Agent agent) {
+        AgentDO agentDO = new AgentDO();
+        BeanUtils.copyProperties(agent,agentDO);
+        updateById(agentDO);
+
+    }
+
     /**
      * the example in the agent will be executed by default, if the result is correct, it will be
      * put into memory as a reference for LLM
