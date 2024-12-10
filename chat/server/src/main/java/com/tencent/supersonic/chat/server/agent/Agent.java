@@ -5,6 +5,7 @@ import com.tencent.supersonic.chat.server.memory.MemoryReviewTask;
 import com.tencent.supersonic.common.pojo.ChatApp;
 import com.tencent.supersonic.common.pojo.RecordInfo;
 import lombok.Data;
+import lombok.Setter;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
@@ -15,6 +16,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
+@Setter
 public class Agent extends RecordInfo {
 
     private static final int ONLINE_STATUS = 1;
@@ -33,10 +35,17 @@ public class Agent extends RecordInfo {
     private String toolConfig;
     private Map<String, ChatApp> chatAppConfig = Collections.emptyMap();
     private VisualConfig visualConfig;
+
+    //是否有admin权限对于agent
     private String admin;
     private String adminOrg;
     private String viewer;
     private String viewOrg;
+    private String[] admins;
+    private String[] adminOrgs;
+    private String[] viewers;
+    private String[] viewOrgs;
+    private boolean adminAuth;
 
     public List<String> getTools(AgentToolType type) {
         Map<String, Object> map = JSONObject.parseObject(toolConfig, Map.class);

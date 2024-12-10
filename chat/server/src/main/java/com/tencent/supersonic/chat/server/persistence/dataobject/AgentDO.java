@@ -18,7 +18,9 @@ public class AgentDO {
 
     private String description;
 
-    /** 0 offline, 1 online */
+    /**
+     * 0 offline, 1 online
+     */
     private Integer status;
 
     private String examples;
@@ -40,4 +42,13 @@ public class AgentDO {
     private String chatModelConfig;
 
     private String visualConfig;
+
+    private String admin;
+
+    private String adminOrg;
+
+    private String viewer;
+
+    private String viewOrg;
+
 }
