@@ -176,8 +176,13 @@ public class AgentController {
         if (orgId != null) {
             viewerAgents.addAll(orgViewerAgents);
         }
+        //只读的进行去重和设置adminAuth为false
+        viewerAgents = viewerAgents.stream().distinct().collect(Collectors.toList());
+        for (Agent agent : viewerAgents) {
+            agent.setAdminAuth(false);
+        }
 
-        // 去重并将管理员代理的 isAdmin 设置为 1
+        // 去重并将管理员代理的 isAdmin 设置为 true
         adminAgents = adminAgents.stream().distinct().collect(Collectors.toList());
         for (Agent agent : adminAgents) {
             agent.setAdminAuth(true);
