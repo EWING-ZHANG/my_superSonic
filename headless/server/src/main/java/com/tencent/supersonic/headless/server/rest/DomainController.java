@@ -42,7 +42,6 @@ public class DomainController {
     public DomainResp updateDomain(@RequestBody DomainUpdateReq domainUpdateReq,
             HttpServletRequest request, HttpServletResponse response) {
         User user = UserHolder.findUser(request, response);
-        //
         return domainService.updateDomain(domainUpdateReq, user);
     }
 

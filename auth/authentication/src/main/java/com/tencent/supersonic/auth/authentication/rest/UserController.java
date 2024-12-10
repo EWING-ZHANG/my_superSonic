@@ -10,7 +10,9 @@ import com.tencent.supersonic.auth.api.authentication.request.UserTokenReq;
 import com.tencent.supersonic.auth.api.authentication.service.UserService;
 import com.tencent.supersonic.auth.authentication.request.DepartmentReq;
 import com.tencent.supersonic.common.pojo.User;
+import com.tencent.supersonic.common.pojo.vo.UserVO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,8 +22,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth/user")
@@ -46,8 +51,21 @@ public class UserController {
     }
 
     @GetMapping("/getUserList")
-    public List<User> getUserList() {
-        return userService.getUserList();
+    public List<UserVO> getUserList() {
+        //需要将用户的id都转换成字符串 否则前端无法识别 最后return为json格式
+        List<User> userList = userService.getUserList();
+        ArrayList<UserVO> resList = new ArrayList<>();
+        if(userList != null) {
+            for (User user : userList) {
+                UserVO userVO = new UserVO();
+                BeanUtils.copyProperties(user, userVO);
+                userVO.setId(user.getId().toString());
+                resList.add(userVO);
+            }
+            return resList;
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     @GetMapping("/getOrganizationTree")
