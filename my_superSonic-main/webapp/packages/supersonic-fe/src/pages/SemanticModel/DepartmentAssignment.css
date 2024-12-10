@@ -1,0 +1,32 @@
+/* UserDepartmentManagement.css */
+
+.department-assignment-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+
+.user-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    background-color: #ffffff;
+}
+
+.user-name {
+    flex: 1;
+    font-weight: bold;
+}
+
+.department-select {
+    flex: 2;
+    margin-right: 16px;
+}
+
+button {
+    flex: 1;
+}
