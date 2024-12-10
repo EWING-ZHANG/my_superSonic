@@ -8,12 +8,10 @@ import { ConfigParametersItem, SystemConfig, dependenciesItem } from './types';
 // import { testLLMConn } from '../../services/system';
 import { groupBy } from 'lodash';
 import { genneratorFormItemList } from '../SemanticModel/utils';
-import { getAllUser } from '@/components/SelectTMEPerson/service';
 
 const FormItem = Form.Item;
 
 type Admin = string[];
-let myMap;
 
 const System: React.FC = () => {
   const [systemConfig, setSystemConfig] = useState<Record<string, ConfigParametersItem[]>>({});
@@ -29,7 +27,6 @@ const System: React.FC = () => {
 
   useEffect(() => {
     querySystemConfig();
-
   }, []);
   const [form] = Form.useForm();
   const querySystemConfig = async () => {
@@ -85,8 +82,6 @@ const System: React.FC = () => {
     setSystemConfig(groupByConfig);
   };
 
-
-
   const getDepIoc = (parameters: ConfigParametersItem[]) => {
     const iocMap: Record<string, Record<string, ConfigParametersItem>> = {};
     parameters.forEach((item) => {
@@ -110,6 +105,7 @@ const System: React.FC = () => {
     });
     return iocMap;
   };
+
   const setInitData = (admins: string[], systemConfigParameters: ConfigParametersItem[]) => {
     const fieldsValue = systemConfigParameters.reduce(
       (fields, item) => {

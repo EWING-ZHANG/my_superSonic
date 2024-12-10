@@ -1,7 +1,0 @@
-spring:
-  datasource:
-    url: jdbc:mysql://172.21.74.218:3306/supersonic_db?useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowMultiQueries=true&allowPublicKeyRetrieval=true
-    username: root
-    password: ewing
-    driver-class-name: com.mysql.jdbc.Driver
-

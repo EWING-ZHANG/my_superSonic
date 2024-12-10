@@ -17,6 +17,11 @@ export function deleteAgent(id: number) {
     method: 'DELETE',
   });
 }
+export function getAgent(id: number) {
+  return request<Result<any>>(`/api/chat/agent/${id}`, {
+    method: 'GET',
+  });
+}
 
 export function getModelList() {
   return request<Result<ModelType[]>>('/api/chat/conf/getDomainDataSetTree', {
@@ -75,4 +80,6 @@ export function createMemory(data: any) {
     method: 'POST',
     data,
   });
+
+
 }

@@ -60,8 +60,8 @@ const SelectTMEPerson: FC<Props> = ({ placeholder, value = [], isMultiple = true
       allowClear
       showSearch
       onChange={(selectedIds) => {
-        onChange?.(selectedIds); 
-        mapIdsToDisplayNames(selectedIds, userList);
+        onChange?.(selectedIds); // Pass only IDs to the backend
+        mapIdsToDisplayNames(selectedIds, userList); // Update display names for UI
       }}
     >
       {userList.map((item) => (

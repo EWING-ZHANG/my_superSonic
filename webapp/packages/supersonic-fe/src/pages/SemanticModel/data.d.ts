@@ -127,6 +127,29 @@ export declare namespace ISemantic {
     dimensionCnt?: number;
     metricCnt?: number;
   }
+  interface IAgentItem {
+    id?: number;
+    name?: string;
+    description?: string;
+    createdBy?: string;
+    updatedBy?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    examples?: string[];
+    status?: 0 | 1;
+    enableSearch?: 0 | 1;
+    enableFeedback?: 0 | 1;
+    toolConfig?: string;
+    // modelConfig?: LlmConfigType;
+    chatAppConfig: ChatAppConfig;
+    multiTurnConfig?: MultiTurnConfig;
+    visualConfig?: VisualConfig;
+    admins?: string;
+    viewers?: string;
+    adminOrgs?: string;
+    viewOrgs?: string;
+    adminAuth?: boolean;
+  }
 
   interface IModelItem {
     id: number;
