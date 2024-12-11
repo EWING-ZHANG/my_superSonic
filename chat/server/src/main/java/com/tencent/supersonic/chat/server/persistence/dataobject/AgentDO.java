@@ -50,5 +50,6 @@ public class AgentDO {
     private String viewer;
 
     private String viewOrg;
-
+    //0-disable, 1-open
+    private Integer isOpen;
 }

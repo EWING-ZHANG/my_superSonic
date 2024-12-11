@@ -1,6 +1,8 @@
 package com.tencent.supersonic.chat.server.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.tencent.supersonic.auth.authentication.persistence.dataobject.UserDepartmentDO;
+import com.tencent.supersonic.auth.authentication.utils.ComponentFactory;
 import com.tencent.supersonic.chat.api.pojo.request.ChatMemoryFilter;
 import com.tencent.supersonic.chat.api.pojo.request.ChatParseReq;
 import com.tencent.supersonic.chat.server.agent.Agent;
@@ -12,16 +14,21 @@ import com.tencent.supersonic.chat.server.service.AgentService;
 import com.tencent.supersonic.chat.server.service.ChatQueryService;
 import com.tencent.supersonic.chat.server.service.MemoryService;
 import com.tencent.supersonic.common.config.ChatModel;
+import com.tencent.supersonic.common.config.SystemConfig;
 import com.tencent.supersonic.common.pojo.ChatApp;
 import com.tencent.supersonic.common.pojo.User;
 import com.tencent.supersonic.common.service.ChatModelService;
+import com.tencent.supersonic.common.service.SystemConfigService;
 import com.tencent.supersonic.common.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import sun.management.resources.agent;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
@@ -42,6 +49,9 @@ public class AgentServiceImpl extends ServiceImpl<AgentDOMapper, AgentDO> implem
     private ChatModelService chatModelService;
 
     private ExecutorService executorService = Executors.newFixedThreadPool(1);
+
+    @Autowired
+    private SystemConfigService systemConfigService;
 
     @Override
     public List<Agent> getAgents() {

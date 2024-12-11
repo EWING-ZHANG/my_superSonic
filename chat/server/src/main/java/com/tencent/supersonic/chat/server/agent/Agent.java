@@ -46,6 +46,7 @@ public class Agent extends RecordInfo {
     private String[] viewers;
     private String[] viewOrgs;
     private boolean adminAuth;
+    private Integer isOpen;
 
     public List<String> getTools(AgentToolType type) {
         Map<String, Object> map = JSONObject.parseObject(toolConfig, Map.class);

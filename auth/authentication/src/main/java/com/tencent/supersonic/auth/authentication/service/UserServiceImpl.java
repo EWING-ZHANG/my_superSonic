@@ -22,9 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -41,7 +39,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getCurrentUser(HttpServletRequest httpServletRequest,
-            HttpServletResponse httpServletResponse) {
+                               HttpServletResponse httpServletResponse) {
         User user = UserHolder.findUser(httpServletRequest, httpServletResponse);
         if (user != null) {
             SystemConfig systemConfig = sysParameterService.getSystemConfig();

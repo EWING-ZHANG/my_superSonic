@@ -5,6 +5,7 @@ import com.tencent.supersonic.common.pojo.enums.AuthType;
 import com.tencent.supersonic.headless.api.pojo.request.DomainReq;
 import com.tencent.supersonic.headless.api.pojo.request.DomainUpdateReq;
 import com.tencent.supersonic.headless.api.pojo.response.DomainResp;
+import com.tencent.supersonic.headless.server.persistence.dataobject.DomainDO;
 
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,8 @@ public interface DomainService {
     DomainResp createDomain(DomainReq domainReq, User user);
 
     DomainResp updateDomain(DomainUpdateReq domainUpdateReq, User user);
+
+    void setDomainAuth(DomainDO domainAuth);
 
     void deleteDomain(Long id);
 

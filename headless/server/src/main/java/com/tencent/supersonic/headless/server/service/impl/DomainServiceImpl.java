@@ -66,6 +66,12 @@ public class DomainServiceImpl implements DomainService {
     }
 
     @Override
+    public void setDomainAuth(DomainDO domainAuth) {
+        domainRepository.updateDomain(domainAuth);
+
+    }
+
+    @Override
     public void deleteDomain(Long id) {
         List<ModelResp> modelResps = modelService.getModelByDomainIds(Lists.newArrayList(id));
         if (!CollectionUtils.isEmpty(modelResps)) {
