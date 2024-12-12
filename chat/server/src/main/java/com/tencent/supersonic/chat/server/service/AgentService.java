@@ -18,4 +18,9 @@ public interface AgentService {
     void deleteAgent(Integer id);
 
     void setAgentAuth(Agent agent);
+
+    void deleteAgentAuth(Long id);
+
+    void deleteAgentOrgAndSub(Long id);
+    void deleteAgentORg(Long id);
 }

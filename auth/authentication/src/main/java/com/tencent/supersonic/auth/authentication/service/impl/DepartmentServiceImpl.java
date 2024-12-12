@@ -23,17 +23,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.Stack;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, DepartmentDO>
-        implements DepartmentService {
+public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, DepartmentDO> implements DepartmentService {
     @Autowired
     private UserDepartmentMapper userDepartmentMapper;
     @Autowired
@@ -89,23 +83,26 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
         // 模块之间的这种调用,只能够模块依赖了
         // 查询出admin的 将这个部门从这个字符串中删除
         List<DomainDO> adminOrgList = domainDOMapper.selectAdminOrg(id);
+        //adminOrgList去重
+        List<DomainDO> adminOrgs = adminOrgList.stream().distinct().collect(Collectors.toList());
         // 循环遍历 进行删除
         String aim = id.toString();
-        adminOrgList.forEach(admin -> {
-            String stringAdmin = removeAim(aim, admin);
+        adminOrgs.forEach(admin -> {
+            String stringAdmin = removeAim(aim, admin.getAdminOrg());
             admin.setAdminOrg(stringAdmin);
         });
         List<DomainDO> viewerOrgList = domainDOMapper.selectViewer(id);
-        viewerOrgList.forEach(viewer -> {
-            String stringViewer = removeAim(aim, viewer);
+        List<DomainDO> viewerOrgs = viewerOrgList.stream().distinct().collect(Collectors.toList());
+        viewerOrgs.forEach(viewer -> {
+            String stringViewer = removeAim(aim, viewer.getViewOrg());
             viewer.setViewOrg(stringViewer);
         });
         // 只能批量更新
-        if (!CollectionUtils.isEmpty(adminOrgList)) {
-            domainDOMapper.batchUpdateAdmin(adminOrgList);
+        if (!CollectionUtils.isEmpty(adminOrgs)) {
+            domainDOMapper.batchUpdateAdmin(adminOrgs);
         }
-        if (!CollectionUtils.isEmpty(viewerOrgList)) {
-            domainDOMapper.batchUpdateViewer(viewerOrgList);
+        if (!CollectionUtils.isEmpty(viewerOrgs)) {
+            domainDOMapper.batchUpdateViewer(viewerOrgs);
         }
 
     }
@@ -116,12 +113,12 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
         List<DomainDO> adminList = domainDOMapper.selectAdminUser(id);
         String aim = id.toString();
         adminList.forEach(admin -> {
-            String stringAdmin = removeAim(aim, admin);
+            String stringAdmin = removeAim(aim, admin.getAdmin());
             admin.setAdmin(stringAdmin);
         });
         List<DomainDO> viewerList = domainDOMapper.selectViewUser(id);
         viewerList.forEach(viewer -> {
-            String stringViewer = removeAim(aim, viewer);
+            String stringViewer = removeAim(aim, viewer.getViewer());
             viewer.setViewer(stringViewer);
         });
         if (!CollectionUtils.isEmpty(adminList)) {
@@ -140,6 +137,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
         List<DepartmentDO> list = getDepartmentList();
         // 递归地查询出数据的
         Set<Long> allChildrenIds = getAllChildrenIds(id, list);
+        //整个for循环没生效吗??
         allChildrenIds.forEach(allId -> deleteDepartmentById(allId));
     }
 
@@ -150,22 +148,27 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
     }
 
     private void findChildrenIds(Long departmentId, List<DepartmentDO> departments,
-            Set<Long> childrenIds) {
-        // 将当前节点的 id 添加到集合中
-        childrenIds.add(departmentId);
-        Stack<Long> stack = new Stack<>();
-        stack.add(departmentId);
-        while (!stack.isEmpty()) {
-            // 查找当前节点的子节点
-            departmentId = stack.pop();
-            Long tempId = departmentId;
-            List<DepartmentDO> collect = departments.stream()
-                    .filter(dept -> dept.getParentId() == tempId).collect(Collectors.toList());
-            for (int i = 0; i < collect.size(); i++) {
-                stack.push(collect.get(i).getId());
-                childrenIds.add(collect.get(i).getId());
-            }
+                                 Set<Long> childrenIds) {
+        // 使用队列而不是堆栈，可以更简洁地处理节点遍历
+        Queue<Long> queue = new LinkedList<>();
+        queue.add(departmentId);
 
+        while (!queue.isEmpty()) {
+            Long currentId = queue.poll();
+            // 将当前节点的 id 添加到集合中
+            childrenIds.add(currentId);
+
+            // 查找当前节点的子节点
+            List<DepartmentDO> childDepartments = departments.stream()
+                    .filter(dept -> dept.getParentId().equals(currentId))
+                    .collect(Collectors.toList());
+
+            // 将子节点的 id 加入队列
+            for (DepartmentDO child : childDepartments) {
+                if (!childrenIds.contains(child.getId())) { // 防止重复添加
+                    queue.add(child.getId());
+                }
+            }
         }
     }
 
@@ -173,23 +176,24 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
     /**
      * 删除
      *
-     * @param aim
-     * @param admin
      * @return
      */
-    public String removeAim(String aim, DomainDO admin) {
-        String temp = admin.getAdminOrg();
-        String[] split = temp.split(",");
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < split.length; i++) {
-            if (!split[i].equals(aim)) {
-                stringBuilder.append(split[i]);
-            }
-            if (stringBuilder.length() > 0 && (i != stringBuilder.length() - 1)) {
-                stringBuilder.append(",");
-            }
+    public String removeAim( String idToRemove,String original) {
+        if (original == null || original.isEmpty()) {
+            return original; // 如果字符串为空，直接返回
         }
-        return stringBuilder.toString();
 
+        // 分割字符串为数组
+        String[] parts = original.split(",");
+
+        // 移除匹配的 ID，并去掉空白部分
+        List<String> updatedParts = Arrays.stream(parts)
+                .map(String::trim) // 去掉空格
+                .filter(part -> !part.equals(idToRemove)) // 过滤掉匹配的 ID
+                .collect(Collectors.toList());
+
+        // 重新拼接字符串
+        return String.join(",", updatedParts);
     }
+
 }

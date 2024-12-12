@@ -46,6 +46,7 @@ public class AgentController {
     @Autowired
     private DomainService domainService;
 
+
     @PostMapping
     public Agent createAgent(@RequestBody Agent agent, HttpServletRequest httpServletRequest,
                              HttpServletResponse httpServletResponse) {
@@ -269,173 +270,19 @@ public class AgentController {
 
     @GetMapping("/deleteAgentAuth/{id}")
     public void deleteAgentAuth(@PathVariable("id") Long id) {
-        SystemConfig systemConfig = systemConfigService.getSystemConfig();
-        List<String> systemAdmin = systemConfig.getAdmins();
-        systemAdmin.remove(id.toString());
-        systemConfig.setAdmins(systemAdmin);
-        systemConfigService.save(systemConfigService.getSystemConfig());
+        //找出所有子部门以及部门下的人
+        agentService.deleteAgentAuth(id);
 
-        //查询出该用户有哪些Agent 然后将如果agent中有这个id 则删除 最后更新这个agent
-        Agent agent = agentService.getAgent(id.intValue());
-        List<Agent> agentList = getAgentList(id.intValue());
-        List<Agent> list = agentList;
-        list.forEach(temp -> {
-            // 处理 Admin 字段
-            String updatedAdmin = processIdRemoval(temp.getAdmin(), id.toString());
-            temp.setAdmin(updatedAdmin);
-
-            // 处理 Viewer 字段
-            String updatedViewer = processIdRemoval(temp.getViewer(), id.toString());
-            temp.setViewer(updatedViewer);
-
-            // 更新授权
-            agentService.setAgentAuth(temp);
-        });
-
-
-
-//        if (agent != null) {
-//            String admin = agent.getAdmin();
-//            admin.replace(id.toString(), "");
-//            agent.setAdmin(admin);
-//
-//            String viewer = agent.getViewer();
-//            viewer.replace(id.toString(), "");
-//            agent.setViewer(viewer);
-//
-//            agentService.setAgentAuth(agent);
-//        }
-        //domain中权限设置的admin和viewer对应的id需要删除
-        //查询有那些domain
-        //更新domain
-        List<DomainResp> domainList = domainService.getDomainList();
-        //根据用户id 过滤出来admins和viewers中有这个id的数据
-        List<DomainResp> collect = domainList.stream().filter(domain -> domain.getAdmins().contains(id.toString()) || domain.getViewers().contains(id.toString())
-        ).collect(Collectors.toList());
-
-
-        collect.forEach(domain -> {
-            //list转string
-            domain.getAdmins().remove(id.toString());
-            domain.getViewers().remove(id.toString());
-            String strAdmin = String.join(",", domain.getAdmins());
-            String strViewer = String.join(",", domain.getViewers());
-            DomainDO domainDO = new DomainDO();
-            BeanUtils.copyProperties(domain, domainDO);
-            domainDO.setAdmin(strAdmin);
-            domainDO.setViewer(strViewer);
-            domainService.setDomainAuth(domainDO);
-        });
     }
+    /**
+     * 删除了部门 删除通过部门关联的权限
+     *
+     */
 
-    public List<Agent> getAgentList(Integer userId) {
-        // 获取所有代理
-        List<Agent> agents = agentService.getAgents();
-
-
-        List<Agent> viewerAgents = new ArrayList<>();
-        List<Agent> adminAgents = new ArrayList<>();
-
-
-        // 获取用户部门信息
-        List<UserDepartmentDO> userWithDepartment = userDepartmentRepository.getUserWithDepartment();
-
-        // 获取当前用户的部门ID，默认值为 null
-        String orgId;
-        if (userId != null) {
-            orgId = userWithDepartment.stream()
-                    .filter(userDepartmentDO -> userId.equals(userDepartmentDO.getUserId()))
-                    .findFirst()
-                    .map(userDepartmentDO -> userDepartmentDO.getDepartmentId() != null ? userDepartmentDO.getDepartmentId().toString() : null)
-                    .orElse(null);
-        } else {
-            orgId = null;
-        }
-
-        // 过滤出属于当前用户部门的 Admin 类型代理
-        List<Agent> orgAdminAgents = new ArrayList<>();
-        if (orgId != null) {
-            orgAdminAgents = agents.stream()
-                    .filter(agent -> agent.getAdmin() != null && Arrays.asList(agent.getAdminOrg().split(",")).contains(orgId))
-                    .collect(Collectors.toList());
-        }
-
-        // 过滤出属于当前用户部门的 Viewer 类型代理
-        List<Agent> orgViewerAgents = new ArrayList<>();
-        if (orgId != null) {
-            orgViewerAgents = agents.stream()
-                    .filter(agent -> agent.getViewer() != null && Arrays.asList(agent.getViewOrg().split(",")).contains(orgId))
-                    .collect(Collectors.toList());
-        }
-
-        // 过滤出用户作为 Admin 的代理
-        List<Agent> userAdminAgents = agents.stream()
-                .filter(agent -> agent.getAdmin() != null && Arrays.asList(agent.getAdmin().split(",")).contains(userId.toString()))
-                .collect(Collectors.toList());
-
-        // 过滤出用户作为 Viewer 的代理
-        List<Agent> userViewerAgents = agents.stream()
-                .filter(agent -> agent.getViewer() != null && Arrays.asList(agent.getViewer().split(",")).contains(userId.toString()))
-                .collect(Collectors.toList());
-
-        // 合并管理员代理列表
-        if (orgId != null) {
-            adminAgents.addAll(orgAdminAgents);
-        }
-        adminAgents.addAll(userAdminAgents);
-
-        // 合并查看者代理列表
-        viewerAgents.addAll(userViewerAgents);
-        if (orgId != null) {
-            viewerAgents.addAll(orgViewerAgents);
-        }
-        //只读的进行去重和设置adminAuth为false
-        viewerAgents = viewerAgents.stream().distinct().collect(Collectors.toList());
-        adminAgents = adminAgents.stream().distinct().collect(Collectors.toList());
-
-        // todo 合并admin权限和只读权限 如果有重复则保留一个并且设置adminAuth为true 对于来自viewerAgents 设置adminAuth为false adminAgents设置adminAuth为true
-        adminAgents.forEach(agent -> agent.setAdminAuth(true));
-        List<Agent> finalAdminAgents = adminAgents;
-        viewerAgents.forEach(agent -> {
-            if (!finalAdminAgents.contains(agent)) {
-                agent.setAdminAuth(false);
-                finalAdminAgents.add(agent);
-            }
-        });
-        finalAdminAgents.forEach(agent -> {
-            String[] adminsS = agent.getAdmin() != null ? agent.getAdmin().split(",") : new String[0];
-            agent.setAdmins(adminsS);
-
-            String[] views = agent.getViewer() != null ? agent.getViewer().split(",") : new String[0];
-            agent.setViewers(views);
-
-            String[] viewOrgs = agent.getViewOrg() != null ? agent.getViewOrg().split(",") : new String[0];
-            agent.setViewOrgs(viewOrgs);
-
-            String[] adminOrgs = agent.getAdminOrg() != null ? agent.getAdminOrg().split(",") : new String[0];
-            agent.setAdminOrgs(adminOrgs);
-        });
-
-        return finalAdminAgents;
+    @GetMapping("/deleteAgentAuthOrg/{id}")
+    public void deleteAgentAuthOrg(@PathVariable("id") Long id){
+        //用户层面需要删除
+        agentService.deleteAgentOrgAndSub(id);
     }
-
-    private String processIdRemoval(String original, String idToRemove) {
-        if (original == null || original.isEmpty()) {
-            return original; // 如果字符串为空，直接返回
-        }
-
-        // 分割字符串为数组
-        String[] parts = original.split(",");
-
-        // 移除匹配的 ID，并去掉空白部分
-        List<String> updatedParts = Arrays.stream(parts)
-                .map(String::trim) // 去掉空格
-                .filter(part -> !part.equals(idToRemove)) // 过滤掉匹配的 ID
-                .collect(Collectors.toList());
-
-        // 重新拼接字符串
-        return String.join(",", updatedParts);
-    }
-
 
 }

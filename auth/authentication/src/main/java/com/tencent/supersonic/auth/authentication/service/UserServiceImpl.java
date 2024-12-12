@@ -32,6 +32,8 @@ public class UserServiceImpl implements UserService {
     private UserDepartmentRepository userDepartmentRepository;
     @Autowired
     private DepartmentService departmentService;
+    @Autowired
+    private SystemConfigService systemConfigService;
 
     public UserServiceImpl(SystemConfigService sysParameterService) {
         this.sysParameterService = sysParameterService;
@@ -142,7 +144,12 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteUserById(Long id) {
         ComponentFactory.getUserAdaptor().deleteUserById(id);
-        // 删除在user_department表中的数据
+        //system权限
+        SystemConfig systemConfig = systemConfigService.getSystemConfig();
+        List<String> systemAdmin = systemConfig.getAdmins();
+        systemAdmin.remove(id.toString());
+        systemConfig.setAdmins(systemAdmin);
+        systemConfigService.save(systemConfigService.getSystemConfig());
         userDepartmentRepository.deleteByUserId(id);
         // 删除domain表中的viewer和admin 超级管理员应该是不能够删除
 

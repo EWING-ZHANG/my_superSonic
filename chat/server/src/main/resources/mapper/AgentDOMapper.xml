@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tencent.supersonic.chat.server.persistence.mapper.AgentDOMapper">
+    <update id="batchUpdateAdminOrg">
+        <foreach collection="list" item="agent" separator=";">
+            update s2_agent d set admin_org=#{agent.adminOrg} where d.id=#{agent.id}
+        </foreach>
+    </update>
+    <update id="batchUpdateViewOrg">
+        <foreach collection="list" item="agent" separator=";">
+            update s2_agent d set view_org=#{agent.viewOrg} where d.id=#{agent.id}
+        </foreach>
+    </update>
+    <select id="selectViewOrg"
+            resultType="com.tencent.supersonic.chat.server.persistence.dataobject.AgentDO">
+        SELECT * FROM s2_agent d
+        WHERE FIND_IN_SET(#{id},view_org)>0
+
+    </select>
+    <select id="selectAdminOrg"
+            resultType="com.tencent.supersonic.chat.server.persistence.dataobject.AgentDO">
+    SELECT * FROM s2_agent d
+    WHERE FIND_IN_SET(#{id},admin_org)>0
+    </select>
+</mapper>    
