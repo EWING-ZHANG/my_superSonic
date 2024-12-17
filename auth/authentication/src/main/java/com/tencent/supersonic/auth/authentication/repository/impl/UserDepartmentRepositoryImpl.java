@@ -2,11 +2,12 @@ package com.tencent.supersonic.auth.authentication.repository.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.tencent.supersonic.auth.authentication.persistence.dataobject.UserDepartmentDO;
 import com.tencent.supersonic.auth.authentication.persistence.mapper.UserDepartmentMapper;
 import com.tencent.supersonic.auth.authentication.repository.UserDepartmentRepository;
 import com.tencent.supersonic.auth.authentication.request.UserDepartmentReq;
-import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ObjectUtils;
@@ -47,23 +48,33 @@ public class UserDepartmentRepositoryImpl implements UserDepartmentRepository {
 
     @Override
     public List<UserDepartmentDO> getUserWithoutDepartment() {
-        List<UserDepartmentDO> result = userDepartmentMapper.getUserWithoutDepartment();
-        return result;
+        return userDepartmentMapper.getUserWithoutDepartment();
     }
 
     @Override
-    public UserDepartmentDO getByUserName(String userName) {
+    public List<UserDepartmentDO> getByUserName(String userName) {
         QueryWrapper<UserDepartmentDO> wrapper = new QueryWrapper<>();
         wrapper.lambda().eq(UserDepartmentDO::getUserName, userName);
-        UserDepartmentDO userDepartmentDO = userDepartmentMapper.selectOne(wrapper);
-        return userDepartmentDO;
+        return userDepartmentMapper.selectList(wrapper);
 
     }
 
     @Override
+    public IPage<UserDepartmentDO> getUserWithDepartment(int pageNum, int pageSize) {
+        IPage<UserDepartmentDO> page = new Page<>(pageNum, pageSize);
+        // wrapper不支持union 只能用xml实现
+        //计算总行数total和总页数pages
+        int total = userDepartmentMapper.countUserWithDepartment();
+        int pages=total%pageSize==0?total/pageSize:total/pageSize+1;
+        System.out.println("-------------pages-----------"+pages);
+        IPage<UserDepartmentDO> res = userDepartmentMapper.selectPage(page);
+        res.setTotal(total);
+        res.setPages(pages);
+        return res;
+    }
+    @Override
     public List<UserDepartmentDO> getUserWithDepartment() {
-        List<UserDepartmentDO> result = userDepartmentMapper.getUserWithDepartment();
-        return result;
+        return userDepartmentMapper.getUserWithDepartment();
     }
 
     @Override
@@ -76,5 +87,18 @@ public class UserDepartmentRepositoryImpl implements UserDepartmentRepository {
         QueryWrapper<UserDepartmentDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(UserDepartmentDO::getUserId, userId);
         userDepartmentMapper.delete(queryWrapper);
+    }
+
+    @Override
+    public List<UserDepartmentDO> getUserListByDepartmentId(Long id) {
+        QueryWrapper<UserDepartmentDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(UserDepartmentDO::getDepartmentId, id);
+        return userDepartmentMapper.selectList(queryWrapper);
+    }
+
+    @Override
+    public Boolean saveOrUpdateList(List<UserDepartmentDO> userDepartmentDOS) {
+        userDepartmentMapper.insertOrUpdate(userDepartmentDOS);
+        return true;
     }
 }

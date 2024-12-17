@@ -54,7 +54,6 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
         // 得到部门树结构
         List<Organization> organizationTree = OrganizationTreeBuilder.buildTree(list);
         return organizationTree;
-        // 打印或查看树形结构
     }
 
     @Override

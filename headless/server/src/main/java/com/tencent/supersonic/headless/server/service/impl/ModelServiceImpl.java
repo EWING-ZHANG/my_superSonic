@@ -392,8 +392,15 @@ public class ModelServiceImpl implements ModelService {
                 .collect(Collectors.toList());
     }
 
+    /***
+     * @param user
+     * @param domainId
+     * @param authType
+     * @return
+     */
     public List<ModelResp> getModelRespAuthInheritDomain(User user, Long domainId,
             AuthType authType) {
+            // 查看用户下的domain的读和写权限
         List<Long> domainIds =
                 domainService.getDomainAuthSet(user, authType).stream().filter(domainResp -> {
                     if (domainId == null) {

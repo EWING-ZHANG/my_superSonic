@@ -67,22 +67,25 @@ public class UserServiceImpl implements UserService {
     public Set<String> getUserAllOrgId(String userName) {
         // 根据userName查询所属部门,然后递归的查询部门然后将所有的部门放进去
         HashSet<String> result = new HashSet<>();
-        UserDepartmentDO byUserName = userDepartmentRepository.getByUserName(userName);
+        List<UserDepartmentDO> byUserName = userDepartmentRepository.getByUserName(userName);
 
         // 根据id循环的去查找他的部门
-        if (!Objects.isEmpty(byUserName) && byUserName.getDepartmentId() != null) {
-            DepartmentDO departmentDO = departmentService.getById(byUserName.getDepartmentId());
-            result.add(String.valueOf(departmentDO.getId()));
-            while (!ObjectUtils.isEmpty(departmentDO) && departmentDO.getId() != null
-                    && departmentDO.getParentId() != 0) {
-                departmentDO = departmentService.getById(departmentDO.getParentId());
-                if (!ObjectUtils.isEmpty(departmentDO)) {
-                    result.add(String.valueOf(departmentDO.getId()));
+        byUserName.forEach(item -> {
+            if (!Objects.isEmpty(item) && item.getDepartmentId() != null) {
+                DepartmentDO departmentDO = departmentService.getById(item.getDepartmentId());
+                result.add(String.valueOf(departmentDO.getId()));
+                while (!ObjectUtils.isEmpty(departmentDO) && departmentDO.getId() != null
+                        && departmentDO.getParentId() != 0) {
+                    departmentDO = departmentService.getById(departmentDO.getParentId());
+                    if (!ObjectUtils.isEmpty(departmentDO)) {
+                        result.add(String.valueOf(departmentDO.getId()));
 
+                    }
                 }
             }
-        }
+        });
         return result;
+
     }
 
     @Override

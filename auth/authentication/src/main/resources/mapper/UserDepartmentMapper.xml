@@ -6,19 +6,100 @@
     <select id="getUserWithoutDepartment"
             resultType="com.tencent.supersonic.auth.authentication.persistence.dataobject.UserDepartmentDO">
         select user.id as userId, user.name as userName
-        from myproject.s2_user user
+        from s2_user user
         where user.id not in (select d.user_id from s2_user_department d)    </select>
     <select id="getUserWithDepartment"
             resultType="com.tencent.supersonic.auth.authentication.persistence.dataobject.UserDepartmentDO">
-        select u.name as userName, u.id as userId, ud.department_id as departmentId, ud.department_name departmentName
-        from s2_user u
-                 left join s2_user_department ud on u.id = ud.user_id
+        SELECT
+        ud.id as id,
+        u.name AS userName,
+        u.id AS userId,
+        ud.department_id AS departmentId,
+        ud.department_name AS departmentName
+        FROM
+        s2_user u
+        LEFT JOIN
+        s2_user_department ud
+        ON u.id = ud.user_id
+
+        UNION
+
+        SELECT
+        ud.id as id,
+        u.name AS userName,
+        u.id AS userId,
+        ud.department_id AS departmentId,
+        ud.department_name AS departmentName
+        FROM
+        s2_user u
+        RIGHT JOIN
+        s2_user_department ud
+        ON u.id = ud.user_id;
+
 
 
     </select>
     <select id="searchByName"
     resultType="com.tencent.supersonic.auth.authentication.persistence.dataobject.UserDepartmentDO">
         select* from s2_user_department where user_name like concat('%',#{searchName},'%')
+    </select>
+    <select id="selectPage"
+            resultType="com.tencent.supersonic.auth.authentication.persistence.dataobject.UserDepartmentDO">
+        SELECT * FROM (
+        SELECT
+        ud.id AS id,
+        u.name AS userName,
+        u.id AS userId,
+        ud.department_id AS departmentId,
+        ud.department_name AS departmentName
+        FROM
+        s2_user u
+        LEFT JOIN
+        s2_user_department ud ON u.id = ud.user_id
+
+        UNION
+
+        SELECT
+        ud.id AS id,
+        u.name AS userName,
+        u.id AS userId,
+        ud.department_id AS departmentId,
+        ud.department_name AS departmentName
+        FROM
+        s2_user u
+        RIGHT JOIN
+        s2_user_department ud ON u.id = ud.user_id
+        ) AS derived_table
+        LIMIT #{page.size} OFFSET #{page.current}  <!-- 使用 page.size 和 page.current -->
+    </select>
+    <select id="countUserWithDepartment"
+            resultType="java.lang.Integer">
+     select count(*) from(
+        SELECT
+        ud.id as id,
+        u.name AS userName,
+        u.id AS userId,
+        ud.department_id AS departmentId,
+        ud.department_name AS departmentName
+        FROM
+        s2_user u
+        LEFT JOIN
+        s2_user_department ud
+        ON u.id = ud.user_id
+
+        UNION
+
+        SELECT
+        ud.id as id,
+        u.name AS userName,
+        u.id AS userId,
+        ud.department_id AS departmentId,
+        ud.department_name AS departmentName
+        FROM
+        s2_user u
+        RIGHT JOIN
+        s2_user_department ud
+        ON u.id = ud.user_id) temp
     </select>
 
 </mapper>

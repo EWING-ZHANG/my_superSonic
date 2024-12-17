@@ -1,5 +1,7 @@
 package com.tencent.supersonic.auth.authentication.rest;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.tencent.supersonic.auth.authentication.persistence.dataobject.DepartmentDO;
 import com.tencent.supersonic.auth.authentication.persistence.dataobject.UserDepartmentDO;
 import com.tencent.supersonic.auth.authentication.pojo.Organization;
@@ -36,7 +38,16 @@ public class UserDepartmentController {
      */
     @PostMapping("/saveOrUpdate")
     public Boolean saveOrUpdate(@RequestBody DepartmentReq departmentReq) {
+        //多选 一个用户可以添加多个部门
         return departmentService.SaveOrUpdate(departmentReq);
+    }
+    /**
+     * 新增 一个用户可以添加多个部门 存一个list
+     */
+    @PostMapping("/saveOrUpdateList")
+    public Boolean saveOrUpdateList(@RequestBody List<UserDepartmentDO> userDepartmentDOS) {
+        //多选 一个用户可以添加多个部门
+        return userDepartmentService.saveOrUpdateList(userDepartmentDOS);
     }
 
     /**
@@ -59,9 +70,15 @@ public class UserDepartmentController {
         return userDepartmentService.getUserWithoutDepartment();
     }
 
+    /**
+     * 只用到了这个接口返回所有用户 todo 分页
+     * @return
+     */
+
     @GetMapping("getUserWithDepartment")
-    public List<UserDepartmentDO> getUserWithDepartment() {
-        return userDepartmentService.getUserWithDepartment();
+    public IPage<UserDepartmentDO> getUserWithDepartment(@RequestParam int pageNum, @RequestParam int pageSize) {
+
+        return userDepartmentService.getUserWithDepartment(pageNum,pageSize);
     }
 
     // 根据用户名称进行模糊查询用户以及部门信息数据
@@ -87,5 +104,9 @@ public class UserDepartmentController {
         departmentService.deleteDepartmentAndSubById(id);
     }
 
+    @GetMapping("/getUserListByDepartmentId/{id}")
+    public List<UserDepartmentDO> getUserListByDepartmentId(@PathVariable Long id) {
+        return userDepartmentService.getUserListByDepartmentId(id);
+    }
 
 }
