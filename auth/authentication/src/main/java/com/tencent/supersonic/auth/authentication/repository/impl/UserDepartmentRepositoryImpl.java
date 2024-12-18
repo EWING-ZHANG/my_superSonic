@@ -60,14 +60,13 @@ public class UserDepartmentRepositoryImpl implements UserDepartmentRepository {
     }
 
     @Override
-    public IPage<UserDepartmentDO> getUserWithDepartment(int pageNum, int pageSize) {
+    public IPage<UserDepartmentDO> getUserWithDepartment(int pageNum, int pageSize, String userName,String departmentName) {
         IPage<UserDepartmentDO> page = new Page<>(pageNum, pageSize);
         // wrapper不支持union 只能用xml实现
         //计算总行数total和总页数pages
-        int total = userDepartmentMapper.countUserWithDepartment();
+        int total = userDepartmentMapper.countUserWithDepartment(userName,departmentName);
         int pages=total%pageSize==0?total/pageSize:total/pageSize+1;
-        System.out.println("-------------pages-----------"+pages);
-        IPage<UserDepartmentDO> res = userDepartmentMapper.selectPage(page);
+        IPage<UserDepartmentDO> res = userDepartmentMapper.selectPage(page,userName,departmentName);
         res.setTotal(total);
         res.setPages(pages);
         return res;
@@ -101,4 +100,22 @@ public class UserDepartmentRepositoryImpl implements UserDepartmentRepository {
         userDepartmentMapper.insertOrUpdate(userDepartmentDOS);
         return true;
     }
+
+    @Override
+    public Boolean saveOrUpdateUserList(List<UserDepartmentDO> userDepartmentDOS) {
+        //先根据userid删除所有记录
+        deleteByUserId(userDepartmentDOS.get(0).getUserId());
+        return saveOrUpdateList(userDepartmentDOS);
+    }
+
+    @Override
+    public Boolean saveOrUpdateDepartmentList(List<UserDepartmentDO> userDepartmentDOS) {
+        //根据部门id删除所有数据
+        Long departmentId = userDepartmentDOS.get(0).getDepartmentId();
+        QueryWrapper<UserDepartmentDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(UserDepartmentDO::getDepartmentId, departmentId);
+        userDepartmentMapper.delete(queryWrapper);
+        return saveOrUpdateList(userDepartmentDOS);
+    }
+
 }

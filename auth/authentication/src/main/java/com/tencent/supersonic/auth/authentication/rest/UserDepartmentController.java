@@ -47,9 +47,18 @@ public class UserDepartmentController {
     @PostMapping("/saveOrUpdateList")
     public Boolean saveOrUpdateList(@RequestBody List<UserDepartmentDO> userDepartmentDOS) {
         //多选 一个用户可以添加多个部门
-        return userDepartmentService.saveOrUpdateList(userDepartmentDOS);
+        return userDepartmentService.saveOrUpdateUserList(userDepartmentDOS);
     }
 
+
+    /**
+     *  共用相关的接口
+     */
+    @PostMapping("/saveOrUpdateLiDepartmentList")
+    public Boolean saveOrUpdateLiDepartmentList(@RequestBody List<UserDepartmentDO> userDepartmentDOS) {
+        //多选 一个用户可以添加多个部门
+        return userDepartmentService.saveOrUpdateList(userDepartmentDOS);
+    }
     /**
      * 获取所有部门信息 有从属关系的 先直接获取所有的部门吧|
      * 
@@ -71,14 +80,14 @@ public class UserDepartmentController {
     }
 
     /**
-     * 只用到了这个接口返回所有用户 todo 分页
+     * 只用到了这个接口返回所有用户（分页版）
      * @return
      */
 
-    @GetMapping("getUserWithDepartment")
-    public IPage<UserDepartmentDO> getUserWithDepartment(@RequestParam int pageNum, @RequestParam int pageSize) {
+    @GetMapping("/getUserWithDepartment")
+    public IPage<UserDepartmentDO> getUserWithDepartment(@RequestParam int pageNum, @RequestParam int pageSize,@RequestParam(required = false) String userName,@RequestParam(required = false)  String departmentName) {
 
-        return userDepartmentService.getUserWithDepartment(pageNum,pageSize);
+        return userDepartmentService.getUserWithDepartment(pageNum,pageSize,userName,departmentName);
     }
 
     // 根据用户名称进行模糊查询用户以及部门信息数据
@@ -98,12 +107,21 @@ public class UserDepartmentController {
             throws InvocationTargetException, IllegalAccessException {
         departmentService.addDepartment(req);
     }
-
+    /**
+     * 删除部门
+     * @param id
+     * @return
+     */
     @GetMapping("/deleteDepartmentById/{id}")
     public void deleteDepartmentById(@PathVariable Long id) {
         departmentService.deleteDepartmentAndSubById(id);
     }
 
+    /**
+     * 查询部门下有哪些用户
+     * @param id
+     * @return
+     */
     @GetMapping("/getUserListByDepartmentId/{id}")
     public List<UserDepartmentDO> getUserListByDepartmentId(@PathVariable Long id) {
         return userDepartmentService.getUserListByDepartmentId(id);

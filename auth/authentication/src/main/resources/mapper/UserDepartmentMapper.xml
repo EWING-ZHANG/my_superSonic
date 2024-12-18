@@ -43,63 +43,53 @@
     resultType="com.tencent.supersonic.auth.authentication.persistence.dataobject.UserDepartmentDO">
         select* from s2_user_department where user_name like concat('%',#{searchName},'%')
     </select>
+    <sql id="selectUserWithDepartment">
+        SELECT
+        ud.id AS id,
+        u.name AS userName,
+        u.id AS userId,
+        ud.department_id AS departmentId,
+        ud.department_name AS departmentName
+        FROM s2_user u
+        LEFT JOIN s2_user_department ud
+        ON u.id = ud.user_id
+        <where>
+            <if test="userName != null and userName != ''">
+                AND u.name LIKE CONCAT('%', #{userName}, '%')
+            </if>
+            <if test="departmentName != null and departmentName != ''">
+                AND ud.department_name LIKE CONCAT('%', #{departmentName}, '%')
+            </if>
+        </where>
+        UNION
+        SELECT
+        ud.id AS id,
+        u.name AS userName,
+        u.id AS userId,
+        ud.department_id AS departmentId,
+        ud.department_name AS departmentName
+        FROM s2_user u
+        RIGHT JOIN s2_user_department ud
+        ON u.id = ud.user_id
+        <where>
+            <if test="userName != null and userName != ''">
+                AND u.name LIKE CONCAT('%', #{userName}, '%')
+            </if>
+            <if test="departmentName != null and departmentName != ''">
+                AND ud.department_name LIKE CONCAT('%', #{departmentName}, '%')
+            </if>
+        </where>
+    </sql>
+
     <select id="selectPage"
             resultType="com.tencent.supersonic.auth.authentication.persistence.dataobject.UserDepartmentDO">
-        SELECT * FROM (
-        SELECT
-        ud.id AS id,
-        u.name AS userName,
-        u.id AS userId,
-        ud.department_id AS departmentId,
-        ud.department_name AS departmentName
-        FROM
-        s2_user u
-        LEFT JOIN
-        s2_user_department ud ON u.id = ud.user_id
-
-        UNION
-
-        SELECT
-        ud.id AS id,
-        u.name AS userName,
-        u.id AS userId,
-        ud.department_id AS departmentId,
-        ud.department_name AS departmentName
-        FROM
-        s2_user u
-        RIGHT JOIN
-        s2_user_department ud ON u.id = ud.user_id
-        ) AS derived_table
+        SELECT * FROM (<include refid="selectUserWithDepartment" />) AS derived_table
         LIMIT #{page.size} OFFSET #{page.current}  <!-- 使用 page.size 和 page.current -->
     </select>
     <select id="countUserWithDepartment"
             resultType="java.lang.Integer">
-     select count(*) from(
-        SELECT
-        ud.id as id,
-        u.name AS userName,
-        u.id AS userId,
-        ud.department_id AS departmentId,
-        ud.department_name AS departmentName
-        FROM
-        s2_user u
-        LEFT JOIN
-        s2_user_department ud
-        ON u.id = ud.user_id
-
-        UNION
-
-        SELECT
-        ud.id as id,
-        u.name AS userName,
-        u.id AS userId,
-        ud.department_id AS departmentId,
-        ud.department_name AS departmentName
-        FROM
-        s2_user u
-        RIGHT JOIN
-        s2_user_department ud
-        ON u.id = ud.user_id) temp
+     select count(*) from(<include refid="selectUserWithDepartment" />
+        ) temp
     </select>
 
 </mapper>

@@ -20,7 +20,7 @@ public interface UserDepartmentRepository {
 
     List<UserDepartmentDO> getByUserName(String userName);
 
-    IPage<UserDepartmentDO> getUserWithDepartment(int pageNum, int pageSize);
+    IPage<UserDepartmentDO> getUserWithDepartment(int pageNum, int pageSize,String userName,String departmentName);
     List<UserDepartmentDO> getUserWithDepartment();
 
     List<UserDepartmentDO> searchByName(String searchName);
@@ -30,4 +30,16 @@ public interface UserDepartmentRepository {
     List<UserDepartmentDO> getUserListByDepartmentId(Long id);
 
     Boolean saveOrUpdateList(List<UserDepartmentDO> userDepartmentDOS);
+
+    /**
+     *  一个用户下选择多个部门
+     * @param userDepartmentDOS
+     * @return
+     */
+    Boolean saveOrUpdateUserList(List<UserDepartmentDO> userDepartmentDOS);
+    /**
+     * 部门下面添加多个用户
+     */
+
+    Boolean saveOrUpdateDepartmentList(List<UserDepartmentDO> userDepartmentDOS);
 }
