@@ -140,6 +140,20 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
         allChildrenIds.forEach(allId -> deleteDepartmentById(allId));
     }
 
+    @Override
+    public void updateDepartmentName(DepartmentReq req) {
+        DepartmentDO departmentDO = new DepartmentDO();
+        departmentDO.setName(req.getName());
+        departmentDO.setId(req.getId());
+        baseMapper.updateById(departmentDO);
+        //将departmentName更新到userDepartment表中
+        QueryWrapper<UserDepartmentDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(UserDepartmentDO::getDepartmentId, req.getId());
+        UserDepartmentDO userDepartmentDO = new UserDepartmentDO();
+        userDepartmentDO.setDepartmentName(req.getName());
+        userDepartmentMapper.update(userDepartmentDO, queryWrapper);
+    }
+
     public Set<Long> getAllChildrenIds(Long departmentId, List<DepartmentDO> departments) {
         Set<Long> childrenIds = new HashSet<>();
         findChildrenIds(departmentId, departments, childrenIds);

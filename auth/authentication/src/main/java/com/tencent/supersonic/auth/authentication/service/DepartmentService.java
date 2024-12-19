@@ -23,4 +23,6 @@ public interface DepartmentService {
     void unbindUser(Long id);
 
     void deleteDepartmentAndSubById(Long id);
+
+    void updateDepartmentName(DepartmentReq req);
 }
