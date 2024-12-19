@@ -4,6 +4,8 @@ import com.tencent.supersonic.common.pojo.RecordInfo;
 import lombok.Data;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Set;
+
 @Data
 public class UserDepartmentReq extends RecordInfo {
     private Long userId;
@@ -12,5 +14,6 @@ public class UserDepartmentReq extends RecordInfo {
     private String departmentName;
     private Integer pageNum;
     private Integer pageSize;
+    private Set<Long> departmentIds;
 
 }

@@ -1,9 +1,9 @@
 package com.tencent.supersonic.auth.authentication.rest;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.tencent.supersonic.auth.authentication.persistence.dataobject.DepartmentDO;
 import com.tencent.supersonic.auth.authentication.persistence.dataobject.UserDepartmentDO;
+import com.tencent.supersonic.auth.authentication.persistence.dataobject.UserDepartmentResp;
 import com.tencent.supersonic.auth.authentication.pojo.Organization;
 import com.tencent.supersonic.auth.authentication.repository.UserDepartmentRepository;
 import com.tencent.supersonic.auth.authentication.request.DepartmentReq;
@@ -81,12 +81,12 @@ public class UserDepartmentController {
     }
 
     /**
-     * 只用到了这个接口返回所有用户（分页版）
+     * 只用到了这个接口返回所有用户（分页版） 展示数据成部门groupby的形式
      * @return
      */
 
     @PostMapping("/getUserWithDepartment")
-    public IPage<UserDepartmentDO> getUserWithDepartment(@RequestBody UserWithDepartmentPageReq req) {
+    public IPage<UserDepartmentResp> getUserWithDepartment(@RequestBody UserWithDepartmentPageReq req) {
 
         return userDepartmentService.getUserWithDepartment(req.getPageNum(), req.getPageSize(), req.getUserName(),req.getDepartmentName());
     }

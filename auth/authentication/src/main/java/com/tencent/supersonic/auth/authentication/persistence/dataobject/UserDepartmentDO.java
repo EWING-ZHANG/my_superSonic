@@ -15,4 +15,5 @@ public class UserDepartmentDO {
     private String userName;
     private String departmentName;
 
+
 }

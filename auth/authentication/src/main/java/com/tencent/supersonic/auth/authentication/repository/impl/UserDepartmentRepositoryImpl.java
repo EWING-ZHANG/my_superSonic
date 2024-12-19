@@ -5,11 +5,13 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.tencent.supersonic.auth.authentication.persistence.dataobject.UserDepartmentDO;
+import com.tencent.supersonic.auth.authentication.persistence.dataobject.UserDepartmentResp;
 import com.tencent.supersonic.auth.authentication.persistence.mapper.UserDepartmentMapper;
 import com.tencent.supersonic.auth.authentication.repository.UserDepartmentRepository;
 import com.tencent.supersonic.auth.authentication.request.UserDepartmentReq;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -60,13 +62,13 @@ public class UserDepartmentRepositoryImpl implements UserDepartmentRepository {
     }
 
     @Override
-    public IPage<UserDepartmentDO> getUserWithDepartment(int pageNum, int pageSize, String userName,String departmentName) {
-        IPage<UserDepartmentDO> page = new Page<>(pageNum, pageSize);
+    public IPage<UserDepartmentResp> getUserWithDepartment(int pageNum, int pageSize, String userName,String departmentName) {
+        IPage<UserDepartmentReq> page = new Page<>(pageNum, pageSize);
         // wrapper不支持union 只能用xml实现
         //计算总行数total和总页数pages
         int total = userDepartmentMapper.countUserWithDepartment(userName,departmentName);
         int pages=total%pageSize==0?total/pageSize:total/pageSize+1;
-        IPage<UserDepartmentDO> res = userDepartmentMapper.selectPage(page,userName,departmentName);
+        IPage<UserDepartmentResp> res = userDepartmentMapper.selectPage(page,userName);
         res.setTotal(total);
         res.setPages(pages);
         return res;
@@ -96,12 +98,14 @@ public class UserDepartmentRepositoryImpl implements UserDepartmentRepository {
     }
 
     @Override
+    @Transactional
     public Boolean saveOrUpdateList(List<UserDepartmentDO> userDepartmentDOS) {
         userDepartmentMapper.insertOrUpdate(userDepartmentDOS);
         return true;
     }
 
     @Override
+    @Transactional
     public Boolean saveOrUpdateUserList(List<UserDepartmentDO> userDepartmentDOS) {
         //先根据userid删除所有记录
         deleteByUserId(userDepartmentDOS.get(0).getUserId());
