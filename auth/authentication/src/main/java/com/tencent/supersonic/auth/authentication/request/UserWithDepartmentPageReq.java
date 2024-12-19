@@ -6,13 +6,14 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Min;
+import java.util.List;
 import java.util.Set;
 
 @Data
 public class UserWithDepartmentPageReq {
 
     // 确保用户名不能为空
-    private String userName;
+    private String displayName;
 
     // 确保部门名称不能为空
     private String departmentName;
@@ -23,6 +24,6 @@ public class UserWithDepartmentPageReq {
     // 设置默认值，并确保页大小不能为空
     private Integer pageSize = 10; // 默认值为 10
 
-    private Set<Long> departmentIds;
+    private List<Long> departmentIds;
 }
 

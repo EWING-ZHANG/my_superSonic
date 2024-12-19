@@ -21,7 +21,7 @@ public interface UserDepartmentRepository {
 
     List<UserDepartmentDO> getByUserName(String userName);
 
-    IPage<UserDepartmentResp> getUserWithDepartment(int pageNum, int pageSize, String userName, String departmentName);
+    IPage<UserDepartmentResp> getUserWithDepartment(int pageNum, int pageSize, String userName, String departmentName,List<Long> departmentIds);
     List<UserDepartmentDO> getUserWithDepartment();
 
     List<UserDepartmentDO> searchByName(String searchName);

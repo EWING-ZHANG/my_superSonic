@@ -15,11 +15,11 @@ import java.util.List;
 public interface UserDepartmentMapper extends BaseMapper<UserDepartmentDO> {
     List<UserDepartmentDO> getUserWithoutDepartment();
 
-    Integer countUserWithDepartment(@Param("userName")String userName,@Param("departmentName") String departmentName);
+    Integer countUserWithDepartment(@Param("userName")String userName,@Param("departmentName") String departmentName,@Param("departmentIds") List<Long> departmentIds);
 
     List<UserDepartmentDO> searchByName(String searchName);
     List<UserDepartmentDO> getUserWithDepartment();
-    IPage<UserDepartmentResp> selectPage(@Param("page") IPage<UserDepartmentReq> page, @Param("userName")String userName);
+    IPage<UserDepartmentResp> selectPage(@Param("page") IPage<UserDepartmentReq> page, @Param("userName")String userName, @Param("departmentIds") List<Long> departmentIds);
 
 
 

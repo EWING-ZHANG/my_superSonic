@@ -88,7 +88,7 @@ public class UserDepartmentController {
     @PostMapping("/getUserWithDepartment")
     public IPage<UserDepartmentResp> getUserWithDepartment(@RequestBody UserWithDepartmentPageReq req) {
 
-        return userDepartmentService.getUserWithDepartment(req.getPageNum(), req.getPageSize(), req.getUserName(),req.getDepartmentName());
+        return userDepartmentService.getUserWithDepartment(req.getPageNum(), req.getPageSize(), req.getDisplayName(),req.getDepartmentName(),req.getDepartmentIds());
     }
 
     // 根据用户名称进行模糊查询用户以及部门信息数据

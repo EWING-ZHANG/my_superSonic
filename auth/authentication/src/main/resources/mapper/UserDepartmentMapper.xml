@@ -6,8 +6,8 @@
         <id property="userId" column="userId"/>
         <result property="userName" column="userName"/>
         <result property="displayName" column="displayName"/>
-        <result property="departmentIds" column="departmentIds" typeHandler="com.tencent.supersonic.auth.authentication.utils.StringToLongListTypeHandler"/>
-        <result property="departmentNames" column="departmentNames" typeHandler="com.tencent.supersonic.auth.authentication.utils.StringToStringListTypeHandler"/>
+        <result property="departmentIds" column="departmentIdsStr" typeHandler="com.tencent.supersonic.auth.authentication.utils.StringToLongListTypeHandler"/>
+        <result property="departmentNames" column="departmentNamesStr" typeHandler="com.tencent.supersonic.auth.authentication.utils.StringToStringListTypeHandler"/>
     </resultMap>
 
     <select id="getUserWithoutDepartment"
@@ -53,46 +53,103 @@
 
 
     <select id="selectPage"
-            resultMap="UserDepartmentRespMap">
-        SELECT * FROM (
-        <![CDATA[
-    SELECT
-      u.id AS userId,
-      u.name AS userName,
-      u.display_name AS displayName,
-      GROUP_CONCAT(ud.department_id ORDER BY ud.department_id) AS departmentIds,
-      GROUP_CONCAT(ud.department_name ORDER BY ud.department_id) AS departmentNames
-    FROM s2_user u
-    LEFT JOIN s2_user_department ud
-      ON u.id = ud.user_id
-    WHERE ud.department_id IN
-      <foreach item="departmentId" collection="departmentIds" open="(" separator="," close=")">
-        #{departmentId}
-      </foreach>
-    GROUP BY u.id, u.name, u.display_name;
-    ]]>
-        ) AS derived_table
-        LIMIT #{page.size} OFFSET #{page.current}  <!-- 使用 page.size 和 page.current -->
+            resultType="com.tencent.supersonic.auth.authentication.persistence.dataobject.UserDepartmentResp">
+        select* from (SELECT
+        u.id AS userId,
+        u.name AS userName,
+        u.display_name AS displayName,
+        GROUP_CONCAT(ud.department_id ORDER BY ud.department_id) AS departmentIdsStr,
+        GROUP_CONCAT(ud.department_name ORDER BY ud.department_id) AS departmentNamesStr
+        FROM s2_user u
+        LEFT JOIN s2_user_department ud
+        ON u.id = ud.user_id
+        <where>
+            <if test="userName != null">
+                AND u.name LIKE CONCAT('%', #{userName}, '%')
+            </if>
+            <if test="departmentIds != null and departmentIds.size() > 0">
+                AND ud.department_id IN
+                <foreach item="departmentId" collection="departmentIds" open="(" separator="," close=")">
+                    #{departmentId}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY u.id
+
+        UNION
+
+        SELECT
+        u.id AS userId,
+        u.name AS userName,
+        u.display_name AS displayName,
+        GROUP_CONCAT(ud.department_id ORDER BY ud.department_id) AS departmentIdsStr,
+        GROUP_CONCAT(ud.department_name ORDER BY ud.department_id) AS departmentNamesStr
+        FROM s2_user u
+        RIGHT JOIN s2_user_department ud
+        ON u.id = ud.user_id
+        <where>
+            <if test="userName != null">
+                AND u.name LIKE CONCAT('%', #{userName}, '%')
+            </if>
+            <if test="departmentIds != null and departmentIds.size() > 0">
+                AND ud.department_id IN
+                <foreach item="departmentId" collection="departmentIds" open="(" separator="," close=")">
+                    #{departmentId}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY u.id) temp
+        LIMIT #{page.size} OFFSET #{page.current}
+
     </select>
     <select id="countUserWithDepartment"
             resultType="java.lang.Integer">
         select count(*) from(
-        <![CDATA[
-    SELECT
-      u.id AS userId,
-      u.name AS userName,
-      u.display_name AS displayName,
-      GROUP_CONCAT(ud.department_id ORDER BY ud.department_id) AS departmentIds,
-      GROUP_CONCAT(ud.department_name ORDER BY ud.department_id) AS departmentNames
-    FROM s2_user u
-    LEFT JOIN s2_user_department ud
-      ON u.id = ud.user_id
-    WHERE ud.department_id IN
-      <foreach item="departmentId" collection="departmentIds" open="(" separator="," close=")">
-        #{departmentId}
-      </foreach>
-    GROUP BY u.id, u.name, u.display_name;
-    ]]>
+        SELECT
+        u.id AS userId,
+        u.name AS userName,
+        u.display_name AS displayName,
+        GROUP_CONCAT(ud.department_id ORDER BY ud.department_id) AS departmentIdsStr,
+        GROUP_CONCAT(ud.department_name ORDER BY ud.department_id) AS departmentNamesStr
+        FROM s2_user u
+        LEFT JOIN s2_user_department ud
+        ON u.id = ud.user_id
+        <where>
+            <if test="userName != null">
+                AND u.name LIKE CONCAT('%', #{userName}, '%')
+            </if>
+            <if test="departmentIds != null and departmentIds.size() > 0">
+                AND ud.department_id IN
+                <foreach item="departmentId" collection="departmentIds" open="(" separator="," close=")">
+                    #{departmentId}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY u.id
+
+        UNION
+
+        SELECT
+        u.id AS userId,
+        u.name AS userName,
+        u.display_name AS displayName,
+        GROUP_CONCAT(ud.department_id ORDER BY ud.department_id) AS departmentIdsStr,
+        GROUP_CONCAT(ud.department_name ORDER BY ud.department_id) AS departmentNamesStr
+        FROM s2_user u
+        RIGHT JOIN s2_user_department ud
+        ON u.id = ud.user_id
+        <where>
+            <if test="userName != null">
+                AND u.name LIKE CONCAT('%', #{userName}, '%')
+            </if>
+            <if test="departmentIds != null and departmentIds.size() > 0">
+                AND ud.department_id IN
+                <foreach item="departmentId" collection="departmentIds" open="(" separator="," close=")">
+                    #{departmentId}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY u.id
         ) temp
     </select>
 

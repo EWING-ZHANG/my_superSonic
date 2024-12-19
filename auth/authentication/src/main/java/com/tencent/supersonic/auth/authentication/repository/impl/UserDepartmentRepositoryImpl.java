@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -62,13 +63,53 @@ public class UserDepartmentRepositoryImpl implements UserDepartmentRepository {
     }
 
     @Override
-    public IPage<UserDepartmentResp> getUserWithDepartment(int pageNum, int pageSize, String userName,String departmentName) {
+    public IPage<UserDepartmentResp> getUserWithDepartment(int pageNum, int pageSize, String userName,String departmentName,List<Long> departmentIds) {
         IPage<UserDepartmentReq> page = new Page<>(pageNum, pageSize);
-        // wrapper不支持union 只能用xml实现
         //计算总行数total和总页数pages
-        int total = userDepartmentMapper.countUserWithDepartment(userName,departmentName);
+        int total = userDepartmentMapper.countUserWithDepartment(userName,departmentName,departmentIds);
         int pages=total%pageSize==0?total/pageSize:total/pageSize+1;
-        IPage<UserDepartmentResp> res = userDepartmentMapper.selectPage(page,userName);
+        int offset = pageSize * (pageNum - 1);
+        page.setCurrent(offset);
+        IPage<UserDepartmentResp> res = userDepartmentMapper.selectPage(page,userName,departmentIds);
+        List<UserDepartmentResp> records = res.getRecords();
+        //将departmentIdsStr转为List<Long> departmentIds departmentNamesStr转为List<String> departmentNames
+        for (UserDepartmentResp record : records) {
+            // 获取字符串字段
+            String departmentIdsStr = record.getDepartmentIdsStr();
+            String departmentNamesStr = record.getDepartmentNamesStr();
+
+            // 如果 departmentIdsStr 不为空，确保其格式正确并转换为 List<Long>
+            List<Long> setDepartmentIds = null;
+            if (departmentIdsStr != null && !departmentIdsStr.isEmpty()) {
+                // 检查是否包含逗号（多项数据）
+                if (departmentIdsStr.contains(",")) {
+                    // 如果是逗号分隔的字符串，先包裹成合法的 JSON 数组格式
+                    setDepartmentIds = com.alibaba.fastjson.JSON.parseArray("[" + departmentIdsStr + "]", Long.class);
+                } else {
+                    // 如果只有一个 ID，将其转换为单个元素的 List
+                    setDepartmentIds = new ArrayList<>();
+                    setDepartmentIds.add(Long.parseLong(departmentIdsStr));
+                }
+            }
+
+            // 如果 departmentNamesStr 不为空，确保其格式正确并转换为 List<String>
+            List<String> departmentNames = null;
+            if (departmentNamesStr != null && !departmentNamesStr.isEmpty()) {
+                // 检查是否包含逗号（多项数据）
+                String[] split = departmentNamesStr.split(",");
+                //转成List<String>
+                departmentNames = new ArrayList<>();
+                for (String s : split) {
+                    departmentNames.add(s);
+                }
+            }
+
+            // 设置转换后的 List 或 null（空值）
+            record.setDepartmentIds(setDepartmentIds);
+            record.setDepartmentNames(departmentNames);
+        }
+
+
         res.setTotal(total);
         res.setPages(pages);
         return res;
