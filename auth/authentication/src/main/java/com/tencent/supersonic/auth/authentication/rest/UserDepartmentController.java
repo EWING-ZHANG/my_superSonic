@@ -8,6 +8,7 @@ import com.tencent.supersonic.auth.authentication.pojo.Organization;
 import com.tencent.supersonic.auth.authentication.repository.UserDepartmentRepository;
 import com.tencent.supersonic.auth.authentication.request.DepartmentReq;
 import com.tencent.supersonic.auth.authentication.request.UserDepartmentReq;
+import com.tencent.supersonic.auth.authentication.request.UserWithDepartmentPageReq;
 import com.tencent.supersonic.auth.authentication.service.DepartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -84,10 +85,10 @@ public class UserDepartmentController {
      * @return
      */
 
-    @GetMapping("/getUserWithDepartment")
-    public IPage<UserDepartmentDO> getUserWithDepartment(@RequestParam int pageNum, @RequestParam int pageSize,@RequestParam(required = false) String userName,@RequestParam(required = false)  String departmentName) {
+    @PostMapping("/getUserWithDepartment")
+    public IPage<UserDepartmentDO> getUserWithDepartment(@RequestBody UserWithDepartmentPageReq req) {
 
-        return userDepartmentService.getUserWithDepartment(pageNum,pageSize,userName,departmentName);
+        return userDepartmentService.getUserWithDepartment(req.getPageNum(), req.getPageSize(), req.getUserName(),req.getDepartmentName());
     }
 
     // 根据用户名称进行模糊查询用户以及部门信息数据
@@ -125,6 +126,10 @@ public class UserDepartmentController {
     @GetMapping("/getUserListByDepartmentId/{id}")
     public List<UserDepartmentDO> getUserListByDepartmentId(@PathVariable Long id) {
         return userDepartmentService.getUserListByDepartmentId(id);
+    }
+    @PutMapping("/updateDepartmentName")
+    public void updateDepartmentName(@RequestBody DepartmentReq req) {
+        departmentService.updateDepartmentName(req);
     }
 
 }
