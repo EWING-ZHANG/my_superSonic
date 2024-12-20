@@ -133,9 +133,8 @@ public class UserDepartmentRepositoryImpl implements UserDepartmentRepository {
 
     @Override
     public List<UserDepartmentDO> getUserListByDepartmentId(Long id) {
-        QueryWrapper<UserDepartmentDO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(UserDepartmentDO::getDepartmentId, id);
-        return userDepartmentMapper.selectList(queryWrapper);
+        //left join 用户和部门信息
+        return userDepartmentMapper.getUserListByDepartmentId(id);
     }
 
     @Override

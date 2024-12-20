@@ -22,5 +22,5 @@ public interface UserDepartmentMapper extends BaseMapper<UserDepartmentDO> {
     IPage<UserDepartmentResp> selectPage(@Param("page") IPage<UserDepartmentReq> page, @Param("userName")String userName, @Param("departmentIds") List<Long> departmentIds);
 
 
-
+    List<UserDepartmentDO> getUserListByDepartmentId(Long id);
 }
