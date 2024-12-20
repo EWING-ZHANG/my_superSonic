@@ -28,7 +28,7 @@ public interface UserDepartmentRepository {
 
     void deleteByUserId(Long userId);
 
-    List<UserDepartmentDO> getUserListByDepartmentId(Long id);
+    List<UserDepartmentResp> getUserListByDepartmentId(Long id);
 
     Boolean saveOrUpdateList(List<UserDepartmentDO> userDepartmentDOS);
 

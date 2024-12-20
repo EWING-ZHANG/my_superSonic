@@ -81,7 +81,7 @@ public class UserDepartmentController {
     }
 
     /**
-     * 只用到了这个接口返回所有用户（分页版） 展示数据成部门groupby的形式
+     * 只用到了这个接口返回所有用户（分页版） 展示数据成部门groupby的形式 按照displayName进行模糊查询
      * @return
      */
 
@@ -124,7 +124,7 @@ public class UserDepartmentController {
      * @return
      */
     @GetMapping("/getUserListByDepartmentId/{id}")
-    public List<UserDepartmentDO> getUserListByDepartmentId(@PathVariable Long id) {
+    public List<UserDepartmentResp> getUserListByDepartmentId(@PathVariable Long id) {
         return userDepartmentService.getUserListByDepartmentId(id);
     }
     @PutMapping("/updateDepartmentName")

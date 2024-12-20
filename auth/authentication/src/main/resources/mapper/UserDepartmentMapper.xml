@@ -57,105 +57,78 @@
 
     <select id="selectPage"
             resultType="com.tencent.supersonic.auth.authentication.persistence.dataobject.UserDepartmentResp">
-        select* from (SELECT
-        u.id AS userId,
-        u.name AS userName,
-        u.display_name AS displayName,
-        GROUP_CONCAT(ud.department_id ORDER BY ud.department_id) AS departmentIdsStr,
-        GROUP_CONCAT(d.name ORDER BY ud.department_id) AS departmentNamesStr
-        FROM s2_user u
-        LEFT JOIN s2_user_department ud
-        ON u.id = ud.user_id
-        left join s2_department d on ud.department_id = d.id
-        <where>
-            <if test="userName != null">
-                AND u.name LIKE CONCAT('%', #{userName}, '%')
-            </if>
-            <if test="departmentIds != null and departmentIds.size() > 0">
-                AND ud.department_id IN
-                <foreach item="departmentId" collection="departmentIds" open="(" separator="," close=")">
-                    #{departmentId}
-                </foreach>
-            </if>
-        </where>
-        GROUP BY u.id
-        UNION
+        SELECT *
+        FROM (
         SELECT
+        u.id AS id,
         u.id AS userId,
-        u.name AS userName,
-        u.display_name AS displayName,
-        GROUP_CONCAT(ud.department_id ORDER BY ud.department_id) AS departmentIdsStr,
-        GROUP_CONCAT(d.name ORDER BY ud.department_id) AS departmentNamesStr
+        u.name as userName,
+        u.display_name as displayName,
+        g.departmentIdsStr,
+        g.departmentNamesStr
         FROM s2_user u
-        RIGHT JOIN s2_user_department ud
-        ON u.id = ud.user_id
-        left join s2_department d on ud.department_id = d.id
-
+        LEFT JOIN (
+        SELECT
+        ud.user_id,
+        GROUP_CONCAT(d.id) AS departmentIdsStr,
+        GROUP_CONCAT(d.name) AS departmentNamesStr
+        FROM s2_user_department ud
+        LEFT JOIN s2_department d ON ud.department_id = d.id
+        GROUP BY ud.user_id
+        ) g ON u.id = g.user_id
         <where>
             <if test="userName != null">
-                AND u.name LIKE CONCAT('%', #{userName}, '%')
+                AND u.display_name LIKE CONCAT('%', #{userName}, '%')
             </if>
+        </where>
+        ) AS combined_table
+        <where>
             <if test="departmentIds != null and departmentIds.size() > 0">
-                AND ud.department_id IN
-                <foreach item="departmentId" collection="departmentIds" open="(" separator="," close=")">
-                    #{departmentId}
+                AND
+                <foreach item="departmentId" collection="departmentIds" open="(" separator=" AND " close=")">
+                    FIND_IN_SET(#{departmentId}, departmentIdsStr) > 0
                 </foreach>
             </if>
         </where>
-        GROUP BY u.id) temp
         LIMIT #{page.size} OFFSET #{page.current}
+
 
     </select>
     <select id="countUserWithDepartment"
             resultType="java.lang.Integer">
-        select count(*) from(
+        select count(*) from(SELECT *
+        FROM (
         SELECT
+        u.id AS id,
         u.id AS userId,
-        u.name AS userName,
-        u.display_name AS displayName,
-        GROUP_CONCAT(ud.department_id ORDER BY ud.department_id) AS departmentIdsStr,
-        GROUP_CONCAT(d.name ORDER BY ud.department_id) AS departmentNamesStr
+        u.name as userName,
+        u.display_name as displayName,
+        g.departmentIdsStr,
+        g.departmentNamesStr
         FROM s2_user u
-        LEFT JOIN s2_user_department ud
-        ON u.id = ud.user_id
-        left join s2_department d on ud.department_id = d.id
+        LEFT JOIN (
+        SELECT
+        ud.user_id,
+        GROUP_CONCAT(d.id) AS departmentIdsStr,
+        GROUP_CONCAT(d.name) AS departmentNamesStr
+        FROM s2_user_department ud
+        LEFT JOIN s2_department d ON ud.department_id = d.id
+        GROUP BY ud.user_id
+        ) g ON u.id = g.user_id
         <where>
             <if test="userName != null">
-                AND u.name LIKE CONCAT('%', #{userName}, '%')
+                AND u.display_name LIKE CONCAT('%', #{userName}, '%')
             </if>
+        </where>
+        ) AS combined_table
+        <where>
             <if test="departmentIds != null and departmentIds.size() > 0">
-                AND ud.department_id IN
-                <foreach item="departmentId" collection="departmentIds" open="(" separator="," close=")">
-                    #{departmentId}
+                AND
+                <foreach item="departmentId" collection="departmentIds" open="(" separator=" AND " close=")">
+                    FIND_IN_SET(#{departmentId}, departmentIdsStr) > 0
                 </foreach>
             </if>
         </where>
-        GROUP BY u.id
-
-        UNION
-
-        SELECT
-        u.id AS userId,
-        u.name AS userName,
-        u.display_name AS displayName,
-        GROUP_CONCAT(ud.department_id ORDER BY ud.department_id) AS departmentIdsStr,
-        GROUP_CONCAT(d.name ORDER BY ud.department_id) AS departmentNamesStr
-        FROM s2_user u
-        RIGHT JOIN s2_user_department ud
-        ON u.id = ud.user_id
-        left join s2_department d on ud.department_id = d.id
-        <where>
-            <if test="userName != null">
-                AND u.name LIKE CONCAT('%', #{userName}, '%')
-            </if>
-            <if test="departmentIds != null and departmentIds.size() > 0">
-                AND ud.department_id IN
-                <foreach item="departmentId" collection="departmentIds" open="(" separator="," close=")">
-                    #{departmentId}
-                </foreach>
-            </if>
-        </where>
-        GROUP BY u.id
         ) temp
     </select>
     <select id="getUserListByDepartmentId"

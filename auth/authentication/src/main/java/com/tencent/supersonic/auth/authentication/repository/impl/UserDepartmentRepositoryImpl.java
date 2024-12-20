@@ -1,5 +1,6 @@
 package com.tencent.supersonic.auth.authentication.repository.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.Query;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -112,6 +113,7 @@ public class UserDepartmentRepositoryImpl implements UserDepartmentRepository {
 
         res.setTotal(total);
         res.setPages(pages);
+        res.setCurrent(pageNum);
         return res;
     }
     @Override
@@ -132,7 +134,7 @@ public class UserDepartmentRepositoryImpl implements UserDepartmentRepository {
     }
 
     @Override
-    public List<UserDepartmentDO> getUserListByDepartmentId(Long id) {
+    public List<UserDepartmentResp> getUserListByDepartmentId(Long id) {
         //left join 用户和部门信息
         return userDepartmentMapper.getUserListByDepartmentId(id);
     }
@@ -140,8 +142,16 @@ public class UserDepartmentRepositoryImpl implements UserDepartmentRepository {
     @Override
     @Transactional
     public Boolean saveOrUpdateList(List<UserDepartmentDO> userDepartmentDOS) {
+        //将部门里面的人删除再添加
+        deleteByDepartmentId(userDepartmentDOS.get(0).getDepartmentId());
         userDepartmentMapper.insertOrUpdate(userDepartmentDOS);
         return true;
+    }
+
+    private void deleteByDepartmentId(Long departmentId) {
+        QueryWrapper<UserDepartmentDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(UserDepartmentDO::getDepartmentId, departmentId);
+        userDepartmentMapper.delete(queryWrapper);
     }
 
     @Override
