@@ -159,7 +159,8 @@ public class UserDepartmentRepositoryImpl implements UserDepartmentRepository {
     public Boolean saveOrUpdateUserList(List<UserDepartmentDO> userDepartmentDOS) {
         //先根据userid删除所有记录
         deleteByUserId(userDepartmentDOS.get(0).getUserId());
-        return saveOrUpdateList(userDepartmentDOS);
+        userDepartmentMapper.insertOrUpdate(userDepartmentDOS);
+        return true;
     }
 
     @Override
@@ -169,7 +170,8 @@ public class UserDepartmentRepositoryImpl implements UserDepartmentRepository {
         QueryWrapper<UserDepartmentDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(UserDepartmentDO::getDepartmentId, departmentId);
         userDepartmentMapper.delete(queryWrapper);
-        return saveOrUpdateList(userDepartmentDOS);
+        userDepartmentMapper.insertOrUpdate(userDepartmentDOS);
+        return true;
     }
 
 }
